@@ -1,0 +1,1 @@
+Git init/commit was skipped or failed in this environment: Command '['git', 'commit', '-m', 'Initial MATE.md protocol draft']' returned non-zero exit status 128.
