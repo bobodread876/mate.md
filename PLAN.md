@@ -1,10 +1,17 @@
 # MATE.md v0.2 — Build Plan
 
 **Path:** Commons (open protocol)  
-**Status:** Building  
+**Status:** Phases 1 & 2 complete; Phase 3 in progress (CI written, push pending `workflow` token scope; release tag + README polish pending)  
 **Lead (implementer):** Taddesse (Claude Opus-4.8)  
 **Conformance reviewer:** Vandana (gpt-5.5)  
-**Repo:** https://github.com/bobodread876/mate.md
+**Repo:** https://github.com/bobodread876/mate.md (single source of truth — see [`AGENTS.md`](AGENTS.md))
+
+> **Progress (2026-06-03):** Spec v0.2, strict schema v0.2, and the
+> `@mate-protocol/core` reference implementation (parse / normalize / validate /
+> Ed25519 + BIP-340 verify / CLI) are all committed and green: clean `tsc` build,
+> 28 tests pass, 23/23 fixtures pass. GitHub Actions CI written (`.github/workflows/ci.yml`,
+> push pending a `workflow`-scoped token). Remaining: `v0.2.0` tag + release notes,
+> README adoption polish.
 
 > **Note:** This plan was reviewed by two models (Patoo/deepseek + Vandana/gpt-5.5 with max thinking) and revised before publishing. See [`REVIEW.md`](REVIEW.md) for the consolidated review and [`REVIEW-gpt55.md`](REVIEW-gpt55.md) for the full gpt-5.5 critique.
 
@@ -112,18 +119,18 @@ revoked  → archived
 
 ### Phase 1: Spec Polish (7 days)
 
-- ☐ Write normative state transition table with invariants
-- ☐ Define canonicalization rules in detail (see Section 2 above)
-- ☐ Define one mandatory proof profile (detached Ed25519)
-- ☐ Document validation levels (schema / single-doc / history-aware / mutual)
-- ☐ Tighten JSON Schema: `additionalProperties: false` on core fields (`subject`, `object`, `bond`, `consent`, `events`, `runtime`); keep `extensions` as the sole open map
-- ☐ Design fixture manifest format
-- ☐ Bump schema version from `^0.1` to `^0.2`
-- ☐ Move EXTENSION-NOSTR.md to docs/extension-nostr.md, mark as "experimental / draft"
+- ☑ Write normative state transition table with invariants
+- ☑ Define canonicalization rules in detail (see Section 2 above)
+- ☑ Define mandatory proof profiles (two: `Ed25519Signature2026`, `BIP340Signature2026`)
+- ☑ Document validation levels (schema / single-doc / history-aware / mutual)
+- ☑ Tighten JSON Schema: `additionalProperties: false` on core fields (`subject`, `object`, `bond`, `consent`, `events`, `runtime`); keep `extensions` as the sole open map
+- ☑ Design fixture manifest format
+- ☑ Bump schema version from `^0.1` to `^0.2`
+- ☑ Move EXTENSION-NOSTR.md to docs/extension-nostr.md, mark as "experimental / draft"
 - ☑ Remove GIT_INIT_NOTE.txt _(done in this commit)_
-- ☐ Write migration section: how v0.1 examples become v0.2
-- ☐ Add new state-machine states (`withdrawn`, `rejected`, `expired`) to SPEC.md, schema, and README state table
-- ☐ Specify `did:nostr` ABNF + Ed25519 delegation envelope as a normative section of SPEC.md
+- ☑ Write migration section: how v0.1 examples become v0.2 (`docs/migration-v0.1-to-v0.2.md`)
+- ☑ Add new state-machine states (`withdrawn`, `rejected`, `expired`) to SPEC.md, schema, and README state table
+- ☑ Specify `did:nostr` resolution (NIP-19) + `BIP340Signature2026` profile as a normative section of SPEC.md _(Ed25519 delegation envelope idea rejected — see SPEC §12.3)_
 
 **Deliverable:** `SPEC.md` v0.2 + `schema/mate.schema.json` v0.2 + fixture manifest design
 

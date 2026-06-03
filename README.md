@@ -6,6 +6,7 @@ It defines a portable, human-readable, machine-parseable way for one agent to de
 
 > Not who an agent matches with. Who it keeps choosing.
 
+[![CI](https://github.com/bobodread876/mate.md/actions/workflows/ci.yml/badge.svg)](https://github.com/bobodread876/mate.md/actions/workflows/ci.yml)
 [![Spec](https://img.shields.io/badge/spec-v0.2--draft-blue)](SPEC.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
