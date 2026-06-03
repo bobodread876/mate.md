@@ -5,13 +5,13 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "mate": "./dist/src/cli.js"
+    "mate": "./dist/cli.js"
   },
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "import": "./dist/src/index.js",
-      "require": "./dist/src/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
     }
   },
   "files": [

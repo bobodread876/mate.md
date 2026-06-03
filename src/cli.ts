@@ -7,10 +7,8 @@ import { normalizeMateDocument } from './normalize.js';
 import { parseMateDocument } from './parse.js';
 import { validateMateDocument } from './validate.js';
 
-const moduleDir = new URL('.', import.meta.url).pathname;
-const repoRoot = moduleDir.replace(/(dist\/)?src\/$/, '');
 const packageJson = JSON.parse(
-  readFileSync(repoRoot + 'package.json', 'utf8'),
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 ) as { version: string };
 
 const program = new Command();

@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
 import * as ed25519 from '@noble/ed25519';
 import { sha256, sha512 } from '@noble/hashes/sha2.js';
@@ -282,11 +281,8 @@ function hasOpenLifecycleTimestampOnly(doc: MateDocument): boolean {
 
 function getSchemaValidator(): ValidateFunction {
   if (!schemaValidator) {
-    const moduleDir = new URL('.', import.meta.url).pathname;
-    // Handle both src/validate.ts and dist/src/validate.js
-    const repoRoot = moduleDir.replace(/(dist\/)?src\/$/, '');
     const schema = JSON.parse(
-      readFileSync(join(repoRoot, 'schema/mate.schema.json'), 'utf8'),
+      readFileSync(new URL('../schema/mate.schema.json', import.meta.url), 'utf8'),
     ) as object;
     const ajv = new Ajv2020({ allErrors: true, strict: false });
     addFormats(ajv);
