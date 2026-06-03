@@ -41,9 +41,11 @@ This is the hardest part of v0.2. The plan defines these concretely:
 - **Scope:** Frontmatter only. The body (text after closing `---`) is opaque unless an extension defines otherwise.
 - **Format:** Parsed data canonicalized to JSON (field order, whitespace, unicode normalization). Original text is preserved but not what gets signed/validated.
 - **Signature bytes:** Canonicalized JSON of the core object, excluding `proofs` field (signature cannot include itself).
-- **Proof format (mandatory profile):** Detached Ed25519 signature over canonicalized core bytes. Public key referenced via `proofs[].verificationMethod`, which MUST resolve to one of the **two mandatory-to-implement DID methods for v0.2**: `did:key` or `did:nostr`. Other DID methods (e.g., `did:web`, `did:plc`) are extension-defined and not required for conformance.
-  - **`did:key` resolution:** per the [W3C did:key spec](https://w3c-ccg.github.io/did-method-key/), with the multicodec `0xed` (Ed25519) prefix. Self-contained — no network resolution required.
-  - **`did:nostr` resolution:** the DID is the npub-encoded Nostr public key (BIP-340 secp256k1) or an Ed25519 key delegated via NIP-26-style proof; v0.2 mandates the Ed25519 delegation form for proof signing so the same Ed25519 verifier code path serves both DID methods. Spec MUST define the exact `did:nostr` ABNF and delegation envelope.
+- **Proof profiles (two mandatory-to-implement for v0.2):**
+  - **`Ed25519Signature2026`** for `did:key` (multicodec `0xed`). Detached Ed25519 over canonical bytes per RFC 8032 pure variant. Self-contained DID resolution per the W3C did:key spec.
+  - **`BIP340Signature2026`** for `did:nostr`. BIP-340 Schnorr over secp256k1 over SHA-256 of canonical bytes. Self-contained DID resolution: the `npub1...` bech32 decodes directly to the x-only pubkey per NIP-19. No relay query, no delegation envelope.
+  - **Design correction from earlier draft:** the earlier "Ed25519 delegation envelope for did:nostr" idea was rejected in SPEC.md design. Nostr identities ARE secp256k1 keypairs; forcing an Ed25519 delegation layer adds a delegation event, its own signature, and a resolution path for no real gain. Native BIP-340 over the Nostr key matches existing Nostr practice. Cost: one additional small library (`@noble/secp256k1`, ~50KB).
+- **Public key referencing:** Other DID methods (`did:web`, `did:plc`, etc.) are extension-defined and not required for conformance.
 - **Inline keys:** `proofs[].verificationMethod` MAY also be an inline JWK for testing/portability, but a `did:*` reference SHOULD be preferred in production examples.
 - **Timestamp normalization:** All timestamps MUST be ISO 8601 with UTC suffix (`Z`), microsecond precision. Validator normalizes before comparison.
 - **null vs omitted:** Omitted fields are treated as null. Serializer MUST NOT emit null values; they are absent in canonical form.
@@ -142,8 +144,8 @@ Single package: `@mate-protocol/core`
   - Schema validation via ajv
   - Single-document semantic invariants (state-required fields, timestamp ordering, state-machine legality for transitions visible *within* the document)
   - Proof shape check (algorithm presence, key reference format)
-  - **Actual Ed25519 signature verification** against canonicalized core bytes using a vetted crypto library (`@noble/ed25519`)
-  - **DID resolution** for `did:key` (self-contained, multicodec `0xed`) and `did:nostr` (npub → Ed25519 delegation envelope per the spec) — both mandatory in v0.2
+  - **Actual signature verification** against canonicalized core bytes using vetted crypto libraries (`@noble/ed25519` for `Ed25519Signature2026`; `@noble/secp256k1` for `BIP340Signature2026`)
+  - **DID resolution** for `did:key` (self-contained, multicodec `0xed`) and `did:nostr` (bech32 npub → x-only secp256k1 pubkey per NIP-19) — both mandatory in v0.2
   - Pre-computed test vectors ship with the package so adopters can verify their implementations against canonical signatures
 - `src/cli.ts` — CLI binary `mate`:
   - `mate validate <file...>` — schema + single-doc semantics
@@ -208,7 +210,7 @@ Narrow-scope estimate. Dedicated focused work from one builder. If YAML restrict
 | Normative state transition table with invariants (incl. `withdrawn` / `rejected` / `expired`) | Write from scratch | 1 day |
 | Canonicalization rules (detailed) | Write from scratch | 1.5 day |
 | Proof profile specification (Ed25519 + canonicalization) | Write from scratch | 1 day |
-| `did:nostr` ABNF + Ed25519 delegation envelope spec | Write from scratch | 1 day |
+| `did:nostr` ABNF + NIP-19 resolution + BIP340Signature2026 profile spec | Write from scratch | 1 day |
 | Validation levels documentation | Write from scratch | 0.5 day |
 | v0.2 JSON Schema (core strict, extensions open, new terminal states) | Update existing | 0.75 day |
 | Fixture manifest design | Write from scratch | 0.5 day |
@@ -244,7 +246,7 @@ On the dashboard, "✓ Released" means:
 
 - YAML-only frontmatter for v0.2. Other frontmatter formats (JSON, TOML) can be added in v0.3+.
 - The reference implementation **performs actual Ed25519 signature verification** for the mandatory proof profile, using `did:key` and `did:nostr` resolution. Other DID methods (`did:web`, `did:plc`, etc.) are extension-defined and not required for v0.2 conformance.
-- `did:nostr` is first-class in v0.2 alongside `did:key`. The Ed25519 delegation envelope (vs. raw secp256k1 BIP-340 signatures) is mandated for the v0.2 proof profile so the same verifier code path serves both DID methods.
+- `did:nostr` is first-class in v0.2 alongside `did:key`, using its own mandatory proof profile (`BIP340Signature2026`). The earlier design idea of forcing an Ed25519 delegation envelope over Nostr keys was rejected in SPEC.md §12.3 — see the rationale there. Two crypto libraries, two proof profiles, one verifier dispatcher.
 - Transition validation (did this bond illegally go from `active` to `proposed`?) requires history and is out of scope for v0.2. The spec should state this clearly.
 - Pre-acceptance terminal states (`withdrawn`, `rejected`, `expired`) are deliberately distinct from `revoked`. `revoked` is reserved for the breaking of a previously-established (accepted) bond — this asymmetry preserves the semantic weight of `revoked`.
 - After v0.2, consider writing an OpenClaw plugin that maintains MATE.md bond state as part of the agent's memory — that's the fastest path to real adoption.
