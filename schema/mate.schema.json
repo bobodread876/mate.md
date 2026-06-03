@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mate-md.org/schema/mate.schema.json",
-  "title": "MATE.md frontmatter schema",
+  "title": "MATE.md v0.2 frontmatter schema",
   "type": "object",
   "required": [
     "mate_version",
@@ -13,7 +13,7 @@
   "properties": {
     "mate_version": {
       "type": "string",
-      "pattern": "^0\\.1"
+      "pattern": "^0\\.2"
     },
     "subject": {
       "type": "object",
@@ -26,28 +26,16 @@
           "minLength": 1
         },
         "profile": {
-          "type": [
-            "object",
-            "null"
-          ],
+          "type": ["object", "null"],
+          "required": ["uri", "type"],
           "properties": {
-            "uri": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "type": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
+            "uri": { "type": "string" },
+            "type": { "type": "string" }
           },
-          "additionalProperties": true
+          "additionalProperties": false
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "object": {
       "type": "object",
@@ -60,28 +48,16 @@
           "minLength": 1
         },
         "profile": {
-          "type": [
-            "object",
-            "null"
-          ],
+          "type": ["object", "null"],
+          "required": ["uri", "type"],
           "properties": {
-            "uri": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "type": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
+            "uri": { "type": "string" },
+            "type": { "type": "string" }
           },
-          "additionalProperties": true
+          "additionalProperties": false
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "bond": {
       "type": "object",
@@ -103,127 +79,100 @@
             "active",
             "paused",
             "revoked",
-            "archived"
+            "archived",
+            "withdrawn",
+            "rejected",
+            "expired"
           ]
         },
         "kind": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "created_at": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date-time"
         },
         "updated_at": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date-time"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "consent": {
       "type": "object",
-      "required": [
-        "revocable"
-      ],
+      "required": ["revocable"],
       "properties": {
-        "required": {
-          "type": "boolean"
-        },
-        "mutual": {
-          "type": "boolean"
-        },
-        "revocable": {
-          "type": "boolean"
-        },
-        "unilateral_exit_allowed": {
-          "type": "boolean"
-        },
+        "required": { "type": "boolean" },
+        "mutual": { "type": "boolean" },
+        "revocable": { "type": "boolean" },
+        "unilateral_exit_allowed": { "type": "boolean" },
         "accepted_at": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date-time"
         },
         "revoked_at": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "withdrawn_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "rejected_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "expired_at": {
+          "type": ["string", "null"],
           "format": "date-time"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "policies": {
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "additionalProperties": {
-        "type": [
-          "string",
-          "null"
-        ]
+        "type": ["string", "null"]
       }
     },
     "events": {
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "properties": {
-        "uri": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "type": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "latest_hash": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
+        "uri": { "type": ["string", "null"] },
+        "type": { "type": ["string", "null"] },
+        "latest_hash": { "type": ["string", "null"] }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "proofs": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["type", "verificationMethod", "algorithm", "created", "value"],
+        "properties": {
+          "type": { "type": "string" },
+          "verificationMethod": { "type": "string" },
+          "algorithm": { "type": "string", "enum": ["ed25519", "bip340-schnorr"] },
+          "created": { "type": "string", "format": "date-time" },
+          "value": { "type": "string" }
+        },
         "additionalProperties": true
       }
     },
     "runtime": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "additionalProperties": true
+      "type": ["object", "null"],
+      "properties": {
+        "current_model": { "type": ["string", "null"] },
+        "current_harness": { "type": ["string", "null"] },
+        "runtime_is_authoritative": { "type": "boolean" }
+      },
+      "additionalProperties": false
     },
     "extensions": {
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "additionalProperties": true
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

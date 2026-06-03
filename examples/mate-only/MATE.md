@@ -1,17 +1,11 @@
 ---
-mate_version: "0.1"
+mate_version: "0.2"
 
 subject:
   id: "did:key:z6MkSubjectExample"
-  profile:
-    uri: null
-    type: null
 
 object:
   id: "did:key:z6MkObjectExample"
-  profile:
-    uri: null
-    type: null
 
 bond:
   id: "urn:mate:01HXEXAMPLE"
@@ -21,21 +15,7 @@ bond:
   updated_at: "2026-04-23T00:00:00Z"
 
 consent:
-  required: true
-  mutual: false
   revocable: true
-  unilateral_exit_allowed: true
-
-policies:
-  memory: null
-  privacy: null
-  conflict: null
-  termination: null
-
-events:
-  uri: null
-  type: null
-  latest_hash: null
 
 proofs: []
 ---

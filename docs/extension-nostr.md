@@ -4,6 +4,8 @@ Version: `0.1-draft`
 Extension ID: `mate/nostr`
 Depends on: MATE.md core ≥ 0.1
 
+**Status: Experimental / Draft — not part of v0.2 mandatory conformance.**
+
 ## 1. Purpose
 
 This extension defines how MATE.md bonds are published, discovered, signed, and resolved over the Nostr protocol.

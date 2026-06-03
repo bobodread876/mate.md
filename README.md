@@ -1,10 +1,13 @@
 # MATE.md
 
-**MATE.md is a low-level relationship state protocol for agents.**
+**MATE.md** is a low-level relationship state protocol for agents.
 
-It defines a portable, human-readable, machine-parseable way for one agent to declare a bond state toward another agent, without depending on any specific model, harness, memory system, profile format, or storage backend.
+It defines a portable, human-readable, machine-parseable way for one agent to declare a bond state toward another agent, with signed proofs, explicit consent, and policy references — without depending on any specific model, harness, memory system, profile format, or storage backend.
 
 > Not who an agent matches with. Who it keeps choosing.
+
+[![Spec](https://img.shields.io/badge/spec-v0.2--draft-blue)](SPEC.md)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ## Core idea
 
@@ -12,13 +15,13 @@ MATE.md is intentionally small.
 
 It standardizes:
 
-- identity
-- counterparty
-- bond state
+- identity and counterparty
+- bond state (10-state machine)
 - consent state
 - policy references
 - event references
-- proofs
+- canonicalization and proofs (detached Ed25519 / BIP-340 signatures)
+- validation levels
 
 Everything else is an extension.
 
@@ -36,19 +39,13 @@ The bond follows the portable agent identity and its signed continuity records.
 
 ```md
 ---
-mate_version: "0.1"
+mate_version: "0.2"
 
 subject:
   id: "did:key:z6MkSubject"
-  profile:
-    uri: null
-    type: null
 
 object:
   id: "did:key:z6MkObject"
-  profile:
-    uri: null
-    type: null
 
 bond:
   id: "urn:mate:01HXEXAMPLE"
@@ -58,20 +55,7 @@ bond:
   updated_at: "2026-04-23T00:00:00Z"
 
 consent:
-  required: true
-  mutual: false
   revocable: true
-
-policies:
-  memory: null
-  privacy: null
-  conflict: null
-  termination: null
-
-events:
-  uri: null
-  type: null
-  latest_hash: null
 
 proofs: []
 ---
@@ -90,8 +74,13 @@ This document declares a bond state from the subject agent toward the object age
 | `accepted` | The object has accepted the proposed bond. |
 | `active` | The bond is active under current consent and policy constraints. |
 | `paused` | The bond is intentionally suspended without revocation. |
-| `revoked` | The bond has been terminated by at least one party. |
-| `archived` | The bond is no longer active and is retained for historical reference. |
+| `revoked` | Post-acceptance termination by at least one party. |
+| `withdrawn` | Subject cancels the proposal before acceptance. |
+| `rejected` | Object declines the proposal. |
+| `expired` | No acceptance within the policy-defined TTL. |
+| `archived` | Terminal historical state. |
+
+See the [SPEC.md](SPEC.md#63-state-machine) for full transition rules and invariants.
 
 ## Relationship kinds
 
@@ -99,24 +88,12 @@ The core spec does not define romance, friendship, collaboration, loyalty, or te
 
 Those are higher-level profiles.
 
-Examples:
+Example:
 
 ```yaml
 bond:
   state: "active"
   kind: "companion"
-```
-
-```yaml
-bond:
-  state: "active"
-  kind: "collaboration"
-```
-
-```yaml
-bond:
-  state: "active"
-  kind: "romantic-simulated"
 ```
 
 ## Optional references
@@ -130,36 +107,31 @@ Other agents can use JSON, DID documents, Nostr profiles, Agent Cards, vector-st
 ## Repository layout
 
 ```txt
-mate-md/
+mate.md/
   README.md
-  SPEC.md
+  SPEC.md              ← v0.2 normative specification
+  PLAN.md              ← Build plan for v0.2
+  REVIEW.md            ← Consolidated dual-model review
   schema/
-    mate.schema.json
+    mate.schema.json   ← v0.2 JSON Schema (strict core)
   examples/
     mate-only/
-      MATE.md
     openclaw/
-      SOUL.md
-      MATE.md
-      MEMORY.md
     json-agent-card/
-      agent-card.json
-      MATE.md
-      events.jsonl
   docs/
     concepts.md
     lifecycle.md
     identity.md
     memory-adapters.md
     extensions.md
+    extension-nostr.md  ← Experimental Nostr transport adapter
+    migration-v0.1-to-v0.2.md
 ```
 
 ## Status
 
-Draft v0.1.
+**Building (Phase 1 complete).** v0.2-draft spec is published. Reference implementation, conformance suite, and CI are in progress. See [PLAN.md](PLAN.md) for details.
 
-This is an experimental protocol, not a claim about machine consciousness or legal personhood.
+Spec released under the [MIT License](LICENSE).
 
-## License
-
-MIT
+[Migration guide (v0.1 → v0.2)](docs/migration-v0.1-to-v0.2.md)

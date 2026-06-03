@@ -1,5 +1,5 @@
 ---
-mate_version: "0.1"
+mate_version: "0.2"
 
 subject:
   id: "did:web:example.com:agents:sol"
