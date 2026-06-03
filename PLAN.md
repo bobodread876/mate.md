@@ -1,7 +1,7 @@
 # MATE.md v0.2 — Build Plan
 
 **Path:** Commons (open protocol)  
-**Status:** Phases 1 & 2 complete; Phase 3 in progress (CI written, push pending `workflow` token scope; release tag + README polish pending)  
+**Status:** Phases 1 & 2 complete; Phase 3 nearly done (CI live; `v0.2.0` tagged; README adoption polish remaining)  
 **Lead (implementer):** Taddesse (Claude Opus-4.8)  
 **Conformance reviewer:** Vandana (gpt-5.5)  
 **Repo:** https://github.com/bobodread876/mate.md (single source of truth — see [`AGENTS.md`](AGENTS.md))
@@ -9,9 +9,8 @@
 > **Progress (2026-06-03):** Spec v0.2, strict schema v0.2, and the
 > `@mate-protocol/core` reference implementation (parse / normalize / validate /
 > Ed25519 + BIP-340 verify / CLI) are all committed and green: clean `tsc` build,
-> 28 tests pass, 23/23 fixtures pass. GitHub Actions CI written (`.github/workflows/ci.yml`,
-> push pending a `workflow`-scoped token). Remaining: `v0.2.0` tag + release notes,
-> README adoption polish.
+> 28 tests pass, 23/23 fixtures pass. GitHub Actions CI is live. Released as
+> **`v0.2.0`**. Remaining: README adoption polish.
 
 > **Note:** This plan was reviewed by two models (Patoo/deepseek + Vandana/gpt-5.5 with max thinking) and revised before publishing. See [`REVIEW.md`](REVIEW.md) for the consolidated review and [`REVIEW-gpt55.md`](REVIEW-gpt55.md) for the full gpt-5.5 critique.
 

@@ -44,10 +44,7 @@ npx vitest run         # unit + conformance tests
 npm run validate-all   # runs every fixture against the manifest (needs build first)
 ```
 
-CI (`.github/workflows/ci.yml`) is written to run all four on every push/PR. It is
-**not yet pushed**: the token currently in use lacks GitHub `workflow` scope. To land
-it, run `gh auth refresh -h github.com -s workflow` (or use a PAT with `workflow`),
-then `git add .github && git commit && git push`.
+CI (`.github/workflows/ci.yml`) runs all four on every push/PR.
 
 ## Current status (keep this updated when you land work)
 
@@ -56,8 +53,7 @@ then `git add .github && git commit && git push`.
 - Schema v0.2: **published** (strict core, `extensions` the sole open map).
 - Reference impl: **complete and green** — parse / normalize / validate / verify
   (Ed25519 + BIP-340) / CLI. Build clean, 28 tests pass, 23/23 fixtures pass.
-- CI: GitHub Actions workflow written (build + test + validate-all); push pending a
-  token with `workflow` scope (see Build & verify).
+- CI: GitHub Actions live (build + test + validate-all) on every push/PR.
 - Not yet done: `v0.2.0` git tag + GitHub release; README adoption polish; the
   v0.3+ items listed in `PLAN.md` §1 (Nostr transport adapter, TOML frontmatter,
   history-aware transition validation, mutual-bond resolution).
