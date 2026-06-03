@@ -48,15 +48,35 @@ CI (`.github/workflows/ci.yml`) runs all four on every push/PR.
 
 ## Current status (keep this updated when you land work)
 
+**v0.2.0 is released.** As of 2026-06-03, tag `v0.2.0` (commit `43cadff`):
+
 - Spec v0.2: **published** (normative state machine, canonicalization, two proof
   profiles `Ed25519Signature2026` / `BIP340Signature2026`).
 - Schema v0.2: **published** (strict core, `extensions` the sole open map).
 - Reference impl: **complete and green** — parse / normalize / validate / verify
   (Ed25519 + BIP-340) / CLI. Build clean, 28 tests pass, 23/23 fixtures pass.
-- CI: GitHub Actions live (build + test + validate-all) on every push/PR.
-- Not yet done: `v0.2.0` git tag + GitHub release; README adoption polish; the
-  v0.3+ items listed in `PLAN.md` §1 (Nostr transport adapter, TOML frontmatter,
-  history-aware transition validation, mutual-bond resolution).
+- CI: GitHub Actions **live and green** (build + test + validate-all) on every push/PR.
+- Release: **`v0.2.0` tagged + GitHub release published** with notes + migration link.
+
+See [`CHANGELOG.md`](CHANGELOG.md) and the [v0.2.0 release](https://github.com/bobodread876/mate.md/releases/tag/v0.2.0).
+
+## Next agent — start here
+
+Nothing is half-finished; v0.2 is shipped. Pick from the open work:
+
+1. **README adoption polish** _(small, cosmetic)_ — add a 30-second "What is a
+   MATE.md?" quickstart and an adoption checklist. This is the only leftover
+   Phase 3 item from `PLAN.md`.
+2. **v0.3+ features** _(net-new, see `PLAN.md` §1 "Deferred")_, in rough priority:
+   - Nostr transport adapter (draft in `docs/extension-nostr.md`) — highest
+     adoption value; spec is transport-agnostic so this is additive.
+   - History-aware transition validation (needs prior state / event log).
+   - Mutual-bond resolution (needs both parties' documents).
+   - TOML frontmatter support.
+   Start a v0.3 plan section in `PLAN.md` before writing code.
+
+Whatever you pick: branch or commit to `main`, keep the three verify commands green,
+and update the **Current status** block above + `CHANGELOG.md` when you land it.
 
 ## Working rules
 
