@@ -1,0 +1,47 @@
+{
+  "name": "@mate-protocol/core",
+  "version": "0.2.0",
+  "description": "Reference implementation for the MATE.md v0.2 protocol.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "mate": "./dist/src/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js",
+      "require": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "schema",
+    "fixtures",
+    "README.md",
+    "SPEC.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "validate-all": "node scripts/validate-all.mjs"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^3.0.0",
+    "@noble/hashes": "^2.0.1",
+    "@noble/secp256k1": "^3.0.0",
+    "@scure/base": "^2.0.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "commander": "^14.0.2",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.13"
+  }
+}

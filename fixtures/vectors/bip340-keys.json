@@ -1,0 +1,9 @@
+{
+  "note": "Deterministic secp256k1 (BIP-340) keypair for MATE.md v0.2 test vectors. DO NOT USE IN PRODUCTION.",
+  "seed": "mate-test-vector-bip340-seed-2026",
+  "privateKeyHex": "c1d2e3f405162738495a6b7c8d9e0f112233445566778899aabbccddee001122",
+  "publicKeyHex": "02aabbccddee00112233445566778899aabbccddee00112233445566778899aa",
+  "xOnlyPublicKeyHex": "aabbccddee00112233445566778899aabbccddee00112233445566778899aa",
+  "npub": "npub1testkey4matev02referenceimplementationnostrkey",
+  "didNostr": "did:nostr:npub1testkey4matev02referenceimplementationnostrkey"
+}
