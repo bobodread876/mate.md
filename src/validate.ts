@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { base58 } from '@scure/base';
 
 import * as ed25519 from '@noble/ed25519';
 import { sha256, sha512 } from '@noble/hashes/sha2.js';
@@ -230,7 +231,7 @@ function verifyProofWithErrors(
       return { valid: false, errors };
     }
 
-    const signature = decodeBase64Signature(proof.value);
+    const signature = decodeProofValue(proof.value);
     const canonicalBytes = new TextEncoder().encode(normalizeMateDocument(doc));
     const verified =
       proof.algorithm === ProofAlgorithm.Ed25519
@@ -247,20 +248,14 @@ function verifyProofWithErrors(
   return { valid: errors.length === 0, errors };
 }
 
-function decodeBase64Signature(value: string): Uint8Array {
-  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(value)) {
-    throw new Error('proof value must be base64');
+function decodeProofValue(value: string): Uint8Array {
+  if (!value.startsWith('z')) {
+    throw new Error('proof value must be multibase base58btc with z prefix');
   }
 
-  const signature = Buffer.from(value, 'base64');
+  const signature = base58.decode(value.slice(1));
   if (signature.length !== 64) {
     throw new Error(`proof signature must be 64 bytes, got ${signature.length}`);
-  }
-
-  const normalizedInput = value.replace(/=+$/, '');
-  const normalizedOutput = signature.toString('base64').replace(/=+$/, '');
-  if (normalizedInput !== normalizedOutput) {
-    throw new Error('proof value must be canonical base64');
   }
 
   return signature;

@@ -1,25 +1,164 @@
 [
-  { "file": "valid/mate-only-proposed.md", "expect": "pass", "category": "schema", "rationale": "Minimal valid proposed bond" },
-  { "file": "valid/full-active.md", "expect": "pass", "category": "schema", "rationale": "Full active bond with extensions" },
-  { "file": "valid/withdrawn-proposal.md", "expect": "pass", "category": "semantic", "rationale": "Valid withdrawn terminal state" },
-  { "file": "valid/rejected-proposal.md", "expect": "pass", "category": "semantic", "rationale": "Valid rejected terminal state" },
-  { "file": "valid/expired-proposal.md", "expect": "pass", "category": "semantic", "rationale": "Valid expired terminal state" },
-  { "file": "valid/revoked-bond.md", "expect": "pass", "category": "semantic", "rationale": "Valid revoked bond with accepted_at" },
-  { "file": "valid/archived-bond.md", "expect": "pass", "category": "semantic", "rationale": "Valid archived bond from revoked" },
-  { "file": "valid/none-state.md", "expect": "pass", "category": "schema", "rationale": "Valid none state bond" },
-  { "file": "valid/paused-bond.md", "expect": "pass", "category": "semantic", "rationale": "Valid paused bond with accepted_at" },
-  { "file": "valid/did-nostr-bond.md", "expect": "pass", "category": "schema", "rationale": "Valid did:nostr identifier in subject" },
-  { "file": "valid/body-with-context.md", "expect": "pass", "category": "canonicalization", "rationale": "Valid document with body text" },
-  { "file": "invalid/no-frontmatter.md", "expect": "fail", "category": "schema", "rationale": "No YAML frontmatter" },
-  { "file": "invalid/missing-subject.md", "expect": "fail", "category": "schema", "rationale": "Missing required subject field" },
-  { "file": "invalid/extra-top-level-property.md", "expect": "fail", "category": "schema", "rationale": "Extra property at top level (additionalProperties: false)" },
-  { "file": "invalid/extra-core-property.md", "expect": "fail", "category": "schema", "rationale": "Extra property in subject (additionalProperties: false)" },
-  { "file": "invalid/revoked-no-accepted.md", "expect": "fail", "category": "semantic", "rationale": "Revoked state without accepted_at" },
-  { "file": "invalid/archived-no-terminal.md", "expect": "fail", "category": "semantic", "rationale": "Archived without any terminal timestamp" },
-  { "file": "invalid/timestamps-backwards.md", "expect": "fail", "category": "semantic", "rationale": "created_at after updated_at" },
-  { "file": "invalid/wrong-bond-state.md", "expect": "fail", "category": "schema", "rationale": "Invalid bond state enum value" },
-  { "file": "invalid/wrong-mate-version.md", "expect": "fail", "category": "schema", "rationale": "mate_version pattern mismatch (0.1 vs 0.2)" },
-  { "file": "invalid/yaml-anchor.md", "expect": "fail", "category": "canonicalization", "rationale": "YAML anchor/alias not allowed" },
-  { "file": "invalid/reserved-namespace.md", "expect": "fail", "category": "semantic", "rationale": "Extension uses reserved mate.* namespace" },
-  { "file": "invalid/unknown-did-method.md", "expect": "fail", "category": "semantic", "rationale": "did:web is out of scope for v0.2" }
+  {
+    "file": "valid/mate-only-proposed.md",
+    "expect": "pass",
+    "category": "schema",
+    "rationale": "Minimal valid proposed bond"
+  },
+  {
+    "file": "valid/full-active.md",
+    "expect": "pass",
+    "category": "schema",
+    "rationale": "Full active bond with extensions"
+  },
+  {
+    "file": "valid/withdrawn-proposal.md",
+    "expect": "pass",
+    "category": "semantic",
+    "rationale": "Valid withdrawn terminal state"
+  },
+  {
+    "file": "valid/rejected-proposal.md",
+    "expect": "pass",
+    "category": "semantic",
+    "rationale": "Valid rejected terminal state"
+  },
+  {
+    "file": "valid/expired-proposal.md",
+    "expect": "pass",
+    "category": "semantic",
+    "rationale": "Valid expired terminal state"
+  },
+  {
+    "file": "valid/revoked-bond.md",
+    "expect": "pass",
+    "category": "semantic",
+    "rationale": "Valid revoked bond with accepted_at"
+  },
+  {
+    "file": "valid/archived-bond.md",
+    "expect": "pass",
+    "category": "semantic",
+    "rationale": "Valid archived bond from revoked"
+  },
+  {
+    "file": "valid/none-state.md",
+    "expect": "pass",
+    "category": "schema",
+    "rationale": "Valid none state bond"
+  },
+  {
+    "file": "valid/paused-bond.md",
+    "expect": "pass",
+    "category": "semantic",
+    "rationale": "Valid paused bond with accepted_at"
+  },
+  {
+    "file": "valid/did-nostr-bond.md",
+    "expect": "pass",
+    "category": "schema",
+    "rationale": "Valid did:nostr identifier in subject"
+  },
+  {
+    "file": "valid/body-with-context.md",
+    "expect": "pass",
+    "category": "canonicalization",
+    "rationale": "Valid document with body text"
+  },
+  {
+    "file": "invalid/no-frontmatter.md",
+    "expect": "fail",
+    "category": "schema",
+    "rationale": "No YAML frontmatter"
+  },
+  {
+    "file": "invalid/missing-subject.md",
+    "expect": "fail",
+    "category": "schema",
+    "rationale": "Missing required subject field"
+  },
+  {
+    "file": "invalid/extra-top-level-property.md",
+    "expect": "fail",
+    "category": "schema",
+    "rationale": "Extra property at top level (additionalProperties: false)"
+  },
+  {
+    "file": "invalid/extra-core-property.md",
+    "expect": "fail",
+    "category": "schema",
+    "rationale": "Extra property in subject (additionalProperties: false)"
+  },
+  {
+    "file": "invalid/revoked-no-accepted.md",
+    "expect": "fail",
+    "category": "semantic",
+    "rationale": "Revoked state without accepted_at"
+  },
+  {
+    "file": "invalid/archived-no-terminal.md",
+    "expect": "fail",
+    "category": "semantic",
+    "rationale": "Archived without any terminal timestamp"
+  },
+  {
+    "file": "invalid/timestamps-backwards.md",
+    "expect": "fail",
+    "category": "semantic",
+    "rationale": "created_at after updated_at"
+  },
+  {
+    "file": "invalid/wrong-bond-state.md",
+    "expect": "fail",
+    "category": "schema",
+    "rationale": "Invalid bond state enum value"
+  },
+  {
+    "file": "invalid/wrong-mate-version.md",
+    "expect": "fail",
+    "category": "schema",
+    "rationale": "mate_version pattern mismatch (0.1 vs 0.2)"
+  },
+  {
+    "file": "invalid/yaml-anchor.md",
+    "expect": "fail",
+    "category": "canonicalization",
+    "rationale": "YAML anchor/alias not allowed"
+  },
+  {
+    "file": "invalid/reserved-namespace.md",
+    "expect": "fail",
+    "category": "semantic",
+    "rationale": "Extension uses reserved mate.* namespace"
+  },
+  {
+    "file": "invalid/unknown-did-method.md",
+    "expect": "fail",
+    "category": "semantic",
+    "rationale": "did:web is out of scope for v0.2"
+  },
+  {
+    "file": "valid/ed25519-signed-proposed.md",
+    "expect": "pass",
+    "category": "proofs",
+    "rationale": "Valid Ed25519-signed proposed bond"
+  },
+  {
+    "file": "valid/bip340-signed-proposed.md",
+    "expect": "pass",
+    "category": "proofs",
+    "rationale": "Valid BIP-340 signed proposed bond"
+  },
+  {
+    "file": "invalid/ed25519-bad-signature.md",
+    "expect": "fail",
+    "category": "proofs",
+    "rationale": "Ed25519 signature with bad value"
+  },
+  {
+    "file": "invalid/bip340-bad-signature.md",
+    "expect": "fail",
+    "category": "proofs",
+    "rationale": "BIP-340 signature with bad value"
+  }
 ]

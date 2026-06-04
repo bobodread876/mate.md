@@ -1,7 +1,6 @@
 {
   "note": "Deterministic Ed25519 keypair for MATE.md v0.2 test vectors. DO NOT USE IN PRODUCTION.",
-  "seed": "mate-test-vector-ed25519-seed-2026",
-  "privateKeyHex": "b0bc8a1a2b3c4d5e6f708192a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
-  "publicKeyHex": "3a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718",
-  "didKey": "did:key:z6MkhaX7BHNJ7ytsBHzQZYZqJsmFJGvvqPRTzQgKgKFBCZ1R"
+  "privateKeyHex": "48c7a2005ed118553cdc6ccfb46c115dbb59094732c662d8c3a6fed0fd132e4e",
+  "publicKeyHex": "13671e7fd36d9058a603bf494f8106c9e65dfa301471d46195857cd6f64da9ab",
+  "didKey": "did:key:z6MkfkzzRPZmuRPRjBSHV1yuTty14vwL3hZRv5JNmgnqQrFc"
 }
