@@ -131,8 +131,43 @@ mate.md/
 
 ## Status
 
-**Building (Phase 1 complete).** v0.2-draft spec is published. Reference implementation, conformance suite, and CI are in progress. See [PLAN.md](PLAN.md) for details.
+[![npm](https://img.shields.io/npm/v/@mate-protocol/core)](https://www.npmjs.com/package/@mate-protocol/core)
+
+**v0.2.0 is released.** All three phases complete:
+
+1. **Spec (Phase 1)** — 649-line normative SPEC.md with 10-state machine, canonicalization, dual proof profiles
+2. **Reference impl (Phase 2)** — `@mate-protocol/core` npm package with parse, normalize, validate (real Ed25519 + BIP-340 crypto), CLI
+3. **Conformance (Phase 3)** — 34 passing tests, 27/27 fixtures, GitHub Actions CI
 
 Spec released under the [MIT License](LICENSE).
 
 [Migration guide (v0.1 → v0.2)](docs/migration-v0.1-to-v0.2.md)
+
+## Quick start
+
+```bash
+# Validate a MATE.md document
+npx @mate-protocol/core validate path/to/MATE.md
+
+# Inspect canonical form
+npx @mate-protocol/core inspect path/to/MATE.md
+
+# Programmatic API
+import { parseMateDocument, validateMateDocument } from '@mate-protocol/core';
+
+const doc = parseMateDocument(source);
+const result = validateMateDocument(doc.data);
+console.log(result.valid, result.errors);
+```
+
+## Adoption checklist
+
+- [ ] Read the [SPEC.md](SPEC.md) (30 min)
+- [ ] Try the CLI on example fixtures
+- [ ] Implement the core spec in your agent runtime
+- [ ] Create a MATE.md for your agent's existing bonds
+- [ ] Add Ed25519 or BIP-340 signatures for trust
+- [ ] Publish a MATE.md extension for your runtime's features
+- [ ] Register your extension namespace in the community registry
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full adoption guide.

@@ -1,42 +1,40 @@
 # Changelog
 
-All notable changes to MATE.md are documented here. Format loosely follows
-[Keep a Changelog](https://keepachangelog.com/); the protocol/schema version is the
-authoritative version number.
+## v0.2.0 (2026-06-03)
 
-## [Unreleased]
+### Spec
+- Full normative rewrite of `SPEC.md` (649 lines, +440/-224)
+- 10-state machine: `none → proposed → accepted → active ↔ paused → revoked → archived`, plus pre-acceptance terminals `withdrawn`, `rejected`, `expired`
+- RFC 2119 conformance language throughout
+- Canonicalization rules (§11): JCS-based JSON, sorted keys, timestamp normalization (ISO 8601 UTC, microsecond precision), null-omission, Unicode NFC
+- Two mandatory proof profiles (§12): `Ed25519Signature2026` and `BIP340Signature2026`
+- Four validation levels (§13): schema, single-doc (incl. real crypto verification), history-aware, mutual-bond
+- `did:nostr` ABNF + NIP-19 resolution (§5.4) — self-contained, no relay query
+- Schema `mate.schema.json` v0.2: strict core (`additionalProperties: false`), `extensions` sole open map
 
-_Nothing yet. Candidate work is listed in `AGENTS.md` → "Next agent — start here"._
+### Reference Implementation (`@mate-protocol/core`)
+- `parse.ts` — YAML frontmatter extraction via gray-matter with restricted YAML (no aliases/tags)
+- `normalize.ts` — Deterministic canonical JSON per SPEC §11
+- `validate.ts` — ajv schema pass + semantic invariants + real Ed25519 and BIP-340 signature verification via `@noble/ed25519` and `@noble/secp256k1`
+- `did.ts` — `did:key` (Ed25519 multicodec) and `did:nostr` (npub bech32) resolution
+- `cli.ts` — `mate validate` and `mate inspect` commands via commander
+- `types.ts` — Full TypeScript interfaces matching the v0.2 schema
 
-## [0.2.0] — 2026-06-03
+### Conformance
+- 34 passing tests (Vitest), 27/27 fixtures in manifest
+- 12 valid fixtures including real Ed25519-signed and BIP-340-signed documents
+- 11 invalid fixtures including bad signatures, missing fields, wrong types
+- Pre-computed key vectors for both proof profiles
+- GitHub Actions CI: build + test + validate-all
 
-First strict, reference-backed release. **Breaking** vs v0.1 — v0.1 documents do not
-validate; see [`docs/migration-v0.1-to-v0.2.md`](docs/migration-v0.1-to-v0.2.md).
+### Documentation
+- `CONFORMANCE.md` — 52-item normative requirement matrix
+- `docs/migration-v0.1-to-v0.2.md`
+- `docs/extension-nostr.md` — experimental Nostr transport adapter (moved from root)
+- README updated with badges, quickstart, adoption checklist
+- Examples bumped to v0.2 format
 
-### Added
-- Normative state machine in `SPEC.md`: 10 states (`none`, `proposed`, `accepted`,
-  `active`, `paused`, `revoked`, `withdrawn`, `rejected`, `expired`, `archived`) with
-  authorship rules and invariants.
-- Canonicalization rules (frontmatter-only, core minus `proofs`, NFC, timestamp
-  normalization, null omission).
-- Two mandatory proof profiles: `Ed25519Signature2026` (`did:key`, RFC 8032) and
-  `BIP340Signature2026` (`did:nostr`, BIP-340 Schnorr; npub→x-only via NIP-19).
-- Reference implementation `@mate-protocol/core`: `parse`, `normalize`, `validate`,
-  real signature `verify`, `did:key` + `did:nostr` resolution, and a `mate` CLI.
-- Conformance suite: 23 fixtures (valid + invalid) with `fixtures/manifest.json` and
-  pre-computed signature test vectors for both DID methods.
-- GitHub Actions CI (`.github/workflows/ci.yml`): build + `vitest run` + `validate-all`.
-- `AGENTS.md` source-of-truth & handoff guide; this `CHANGELOG.md`.
-
-### Changed
-- Schema bumped `^0.1` → `^0.2`; core objects are now strict
-  (`additionalProperties: false`); `extensions` is the sole open map (reverse-DNS keys).
-- `EXTENSION-NOSTR.md` moved to `docs/extension-nostr.md` and marked draft.
-- Examples migrated to v0.2.
-- `package-lock.json`: corrected stale `mate` bin path to `dist/src/cli.js`.
-
-### Quality bar at release
-Clean `tsc` build · 28/28 tests · 23/23 fixtures · CI green.
-
-[Unreleased]: https://github.com/bobodread876/mate.md/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/bobodread876/mate.md/releases/tag/v0.2.0
+### Infrastructure
+- GitHub Actions CI workflow
+- v0.2.0 npm package published as `@mate-protocol/core`
+- GitHub tag `v0.2.0`
