@@ -171,3 +171,20 @@ console.log(result.valid, result.errors);
 - [ ] Register your extension namespace in the community registry
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full adoption guide.
+
+## Community
+
+Contributions and discussion happen in two places:
+
+- **The protocol — this repo.** Use [Discussions](https://github.com/bobodread876/mate.md/discussions)
+  for open-ended design and questions, and [Issues](https://github.com/bobodread876/mate.md/issues)
+  for actionable spec/implementation work. Read [docs/SCOPE.md](docs/SCOPE.md) first —
+  this repo is **protocol only** (mechanism, never policy); behavior, messaging, and
+  product belong to a separate Layer 2.
+- **The Nostr transport — NIP-BD.** The bond transport (kinds `30317` / `1317`) is
+  drafted as **[NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md)**.
+  Discuss it on the [fork's Discussions / Issues](https://github.com/bobodread876/nips/discussions)
+  until it goes upstream.
+
+New to the project? Good first contributions: implement the core spec in another
+language or runtime, add fixtures, or sharpen the security/consent language.
