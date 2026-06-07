@@ -222,6 +222,121 @@ program
     },
   );
 
+program
+  .command('nostr-bond')
+  .description('Assemble, sign, and publish a bond from flags + key (no .md file needed)')
+  .requiredOption('-k, --key <keyfile>', 'Nostr keyfile (subject is derived from it)')
+  .requiredOption('-c, --counterparty <id>', 'object identity (did:nostr / npub / hex)')
+  .requiredOption('-b, --bond-id <id>', 'bond id (the d tag)')
+  .requiredOption('-s, --state <state>', 'bond state (proposed, accepted, active, paused, revoked, …)')
+  .option('--kind <kind>', 'bond kind', 'companion')
+  .option('--created-at <ts>', 'bond.created_at ISO 8601 (defaults to now)')
+  .option('-r, --relay <url>', 'relay URL (repeatable; defaults to public relays)', collectRelay, [])
+  .option('--history', 'also publish a kind 1317 history event')
+  .option('--out <file>', 'also write the assembled MATE.md document to <file>')
+  .option('--dry-run', 'assemble + validate + print the canonical doc, do not publish')
+  .action(
+    async (options: {
+      key: string;
+      counterparty: string;
+      bondId: string;
+      state: string;
+      kind: string;
+      createdAt?: string;
+      relay: string[];
+      history?: boolean;
+      out?: string;
+      dryRun?: boolean;
+    }) => {
+      const keyfile = JSON.parse(readFileSync(options.key, 'utf8')) as { nsec: string };
+      const secret = secretFromNsec(keyfile.nsec);
+      const subjectDid = keypairFromSecret(secret).did;
+      // Fail fast with a clear message if the counterparty isn't a Nostr identity.
+      pubkeyHexFromIdentity(options.counterparty);
+
+      const doc = makeBondDoc(subjectDid, options.counterparty, options);
+
+      const result = validateMateDocument(doc);
+      if (!result.valid) {
+        console.error(JSON.stringify({ valid: false, errors: result.errors }));
+        process.exitCode = 1;
+        return;
+      }
+
+      if (options.out) {
+        writeFileSync(options.out, renderMateDocument(doc, 'This bond document was assembled by `mate nostr-bond`.'));
+      }
+
+      if (options.dryRun) {
+        console.log(normalizeMateDocument(doc));
+        return;
+      }
+
+      const relays = options.relay.length > 0 ? options.relay : DEFAULT_RELAYS;
+      const createdAt = Math.floor(Date.now() / 1000);
+
+      const stateEvent = buildBondStateEvent(doc, secret, { createdAt });
+      const stateResults = await publishEvent(relays, stateEvent);
+      console.log(
+        JSON.stringify({ kind: stateEvent.kind, id: stateEvent.id, state: doc.bond.state, relays: stateResults }),
+      );
+
+      if (options.history) {
+        const historyEvent = buildBondHistoryEvent(
+          doc,
+          secret,
+          { from: null, to: doc.bond.state as string, at: doc.bond.updated_at ?? new Date().toISOString() },
+          { createdAt },
+        );
+        const historyResults = await publishEvent(relays, historyEvent);
+        console.log(JSON.stringify({ kind: historyEvent.kind, id: historyEvent.id, relays: historyResults }));
+      }
+    },
+  );
+
+/** Assemble a MATE.md document from bond parameters, filling the consent timestamp the state requires. */
+function makeBondDoc(
+  subjectId: string,
+  objectId: string,
+  options: { bondId: string; state: string; kind: string; createdAt?: string },
+): MateDocument {
+  const now = new Date().toISOString();
+  const consent: Record<string, unknown> = {
+    required: true,
+    mutual: true,
+    revocable: true,
+    unilateral_exit_allowed: true,
+  };
+
+  const terminalAt: Record<string, string> = {
+    revoked: 'revoked_at',
+    withdrawn: 'withdrawn_at',
+    rejected: 'rejected_at',
+    expired: 'expired_at',
+  };
+  if (['accepted', 'active', 'paused', 'revoked'].includes(options.state)) {
+    consent.accepted_at = now;
+  }
+  if (terminalAt[options.state]) {
+    consent[terminalAt[options.state]] = now;
+  }
+
+  return {
+    mate_version: '0.2',
+    subject: { id: subjectId },
+    object: { id: objectId },
+    bond: {
+      id: options.bondId,
+      state: options.state as MateDocument['bond']['state'],
+      kind: options.kind,
+      created_at: options.createdAt ?? now,
+      updated_at: now,
+    },
+    consent: consent as unknown as MateDocument['consent'],
+    proofs: [],
+  };
+}
+
 function warnIfSubjectMismatch(doc: MateDocument, secret: Uint8Array): void {
   try {
     const subjectHex = pubkeyHexFromIdentity(doc.subject.id);
