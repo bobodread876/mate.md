@@ -67,6 +67,6 @@ export function signMateDocument(
     verificationMethod: didKeyFromEd25519PublicKey(publicKey),
     algorithm: ProofAlgorithm.Ed25519,
     created: options.created ?? new Date().toISOString(),
-    value: Buffer.from(signature).toString('base64'),
+    value: `z${base58.encode(signature)}`,
   };
 }

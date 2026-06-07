@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { parseMateDocument, validateMateDocument } from '../dist/src/index.js';
+import { parseMateDocument, validateMateDocument } from '../dist/index.js';
 
 const root = join(fileURLToPath(new URL('..', import.meta.url)));
 const manifest = JSON.parse(readFileSync(join(root, 'fixtures/manifest.json'), 'utf8'));
