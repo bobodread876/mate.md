@@ -11,7 +11,11 @@ secp256k1.hashes.sha256 = sha256;
 export const KIND_BOND_STATE = 30317;
 export const KIND_BOND_HISTORY = 1317;
 
-export const DEFAULT_RELAYS = ['wss://relay.damus.io', 'wss://nos.lol'];
+export const DEFAULT_RELAYS = [
+  'wss://relay.islandbitcoin.com',
+  'wss://relay.damus.io',
+  'wss://nos.lol',
+];
 
 // --- Identity ---------------------------------------------------------------
 
