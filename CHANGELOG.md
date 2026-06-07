@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- CLI key lifecycle: `mate keygen` (generate an Ed25519 `did:key` identity +
+  secret keyfile), `mate sign <file> --key <keyfile>` (append a detached
+  `Ed25519Signature2026` proof over the canonical document), and `mate verify
+  <files...>` (check every proof). Library exports `generateEd25519Keypair`,
+  `didKeyFromEd25519PublicKey`, and `signMateDocument`. This completes the
+  produce side of proofs (v0.2.0 shipped verify-only).
+- Nostr transport (implements `docs/extension-nostr.md` / draft NIP-BD): `mate
+  keygen --nostr` (secp256k1 `did:nostr` / npub / nsec identity), `mate
+  nostr-publish` (publish a bond as kind `30317` current state + optional `1317`
+  history), `mate nostr-resolve` (query relays by author / counterparty / bond,
+  verifying each event signature), and `mate nostr-bond` (assemble + sign +
+  publish a bond straight from flags, no `.md` file). New `src/nostr.ts` module
+  (event id + Schnorr signing + WebSocket publish/resolve) with **zero new
+  dependencies** — built-in `WebSocket` + existing `@noble`/`@scure` libs.
+  `relay.islandbitcoin.com` leads the default relay list.
+
+### Fixed
+- `examples/openclaw/MATE.md` used a bare `extensions.rituals` key, which fails
+  validation (reverse-DNS required). Renamed to `org.openclaw.rituals`.
+
 ## v0.2.0 (2026-06-03)
 
 ### Spec
