@@ -6,7 +6,17 @@ authoritative version number.
 
 ## [Unreleased]
 
-_Nothing yet. Candidate work is listed in `AGENTS.md` → "Next agent — start here"._
+### Added
+- CLI key lifecycle: `mate keygen` (generate an Ed25519 `did:key` identity +
+  secret keyfile), `mate sign <file> --key <keyfile>` (append a detached
+  `Ed25519Signature2026` proof over the canonical document), and `mate verify
+  <files...>` (check every proof). Library exports `generateEd25519Keypair`,
+  `didKeyFromEd25519PublicKey`, and `signMateDocument`. This completes the
+  produce side of proofs (v0.2.0 shipped verify-only).
+
+### Fixed
+- `examples/openclaw/MATE.md` used a bare `extensions.rituals` key, which fails
+  validation (reverse-DNS required). Renamed to `org.openclaw.rituals`.
 
 ## [0.2.0] — 2026-06-03
 

@@ -47,7 +47,7 @@ runtime:
 proofs: []
 
 extensions:
-  rituals:
+  org.openclaw.rituals:
     reaffirmation: "On restart, reread MATE.md and decide whether to reaffirm, pause, update, or revoke."
 ---
 

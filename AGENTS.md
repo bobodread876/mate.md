@@ -54,7 +54,10 @@ CI (`.github/workflows/ci.yml`) runs all four on every push/PR.
   profiles `Ed25519Signature2026` / `BIP340Signature2026`).
 - Schema v0.2: **published** (strict core, `extensions` the sole open map).
 - Reference impl: **complete and green** — parse / normalize / validate / verify
-  (Ed25519 + BIP-340) / CLI. Build clean, 28 tests pass, 23/23 fixtures pass.
+  (Ed25519 + BIP-340) / sign / keygen / CLI. Build clean, 31 tests pass, 23/23
+  fixtures pass.
+- CLI proof lifecycle (Unreleased): `mate keygen` / `mate sign` / `mate verify`
+  now produce + check Ed25519 proofs (v0.2.0 was verify-only).
 - CI: GitHub Actions **live and green** (build + test + validate-all) on every push/PR.
 - Release: **`v0.2.0` tagged + GitHub release published** with notes + migration link.
 
