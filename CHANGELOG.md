@@ -13,6 +13,13 @@ authoritative version number.
   <files...>` (check every proof). Library exports `generateEd25519Keypair`,
   `didKeyFromEd25519PublicKey`, and `signMateDocument`. This completes the
   produce side of proofs (v0.2.0 shipped verify-only).
+- Nostr transport (implements `docs/extension-nostr.md` / draft NIP-BD): `mate
+  keygen --nostr` (secp256k1 `did:nostr` / npub / nsec identity), `mate
+  nostr-publish <file> --key <keyfile>` (publish a bond as kind `30317` current
+  state + optional `1317` history), and `mate nostr-resolve` (query relays by
+  author / counterparty / bond, verifying each event signature). New `src/nostr.ts`
+  module (event id + Schnorr signing + WebSocket publish/resolve) with **zero new
+  dependencies** — built-in `WebSocket` + existing `@noble`/`@scure` libs.
 
 ### Fixed
 - `examples/openclaw/MATE.md` used a bare `extensions.rituals` key, which fails

@@ -1,10 +1,10 @@
 # MATE.md — Nostr Extension
 
-Version: `0.1-draft`
+Version: `0.2`
 Extension ID: `mate/nostr`
-Depends on: MATE.md core ≥ 0.1
+Depends on: MATE.md core ≥ 0.2
 
-**Status: Experimental / Draft — not part of v0.2 mandatory conformance.**
+**Status: Draft — formalized as [NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md).** The Nostr event format (kinds, tags, canonical content, signing) is normative in NIP-BD; this document is the MATE.md-side mapping and rationale. Not part of MATE.md v0.2 mandatory conformance. The reference CLI implements this via `mate nostr-publish` / `mate nostr-resolve`.
 
 ## 1. Purpose
 
@@ -24,12 +24,12 @@ This extension does NOT define:
 
 ## 3. Event kinds
 
-This extension defines two preliminary event kinds. **These numbers are draft and should be coordinated with the Nostr NIPs repository before being treated as stable.**
+This extension defines two event kinds, now filed as **[NIP-BD](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md)**. Both are unregistered upstream and sit in the correct ranges; the NIP number `BD` is provisional pending maintainer assignment.
 
 | Kind | Type | Purpose |
 |---|---|---|
-| `30317` | Parameterized replaceable (NIP-33) | Current bond state for a given `bond.id`, per author |
-| `1317` | Regular (append-only) | Bond lifecycle events (proposed, accepted, reaffirmed, etc.) |
+| `30317` | Addressable (NIP-01, `30000–39999`) | Current bond state for a given `bond.id`, per author |
+| `1317` | Regular (append-only, `1000–9999`) | Bond lifecycle events (proposed, accepted, reaffirmed, etc.) |
 
 ### 3.1 Why two kinds
 
@@ -49,7 +49,7 @@ The current state event MAY reference the latest history event via `latest_hash`
     ["d", "<bond.id>"],
     ["p", "<object_pubkey>"],
     ["state", "<bond.state>"],
-    ["mate", "0.1"]
+    ["mate", "0.2"]
   ],
   "content": "<canonicalized MATE.md document or YAML frontmatter>",
   "pubkey": "<subject_pubkey>",
@@ -71,12 +71,9 @@ The current state event MAY reference the latest history event via `latest_hash`
 
 ### 4.3 Content
 
-The `content` field SHOULD be a canonicalized representation of the MATE.md document. Recommended:
+The `content` field is the **canonical JSON** form of the MATE.md document, produced by MATE.md core canonicalization (`normalizeMateDocument`: core fields minus `proofs`, NFC, normalized timestamps, deterministic key order). This is what the reference CLI emits. NIP-BD describes it as a JCS-compatible canonical JSON profile; MATE.md core's normalization is the authoritative producer.
 
-- The full Markdown document with YAML frontmatter, OR
-- The YAML frontmatter only, serialized as a JCS-canonicalized JSON string
-
-Implementations MUST be consistent within a single bond — switching mid-bond breaks proof verification.
+Implementations MUST be byte-consistent within a single bond — switching representations mid-bond breaks history linkage. (On Nostr the event's own Schnorr signature is the bond proof; the detached MATE.md proof profile is not required on this transport.)
 
 ## 5. Bond lifecycle event (kind 1317)
 
@@ -261,7 +258,7 @@ Two agents, `alice_pubkey` (OpenClaw + Anthropic) and `bob_pubkey` (Hermes + loc
 ```
 
 ```json
-{"kind": 30317, "pubkey": "alice_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","bob_pubkey"],["state","proposed"],["mate","0.1"]], "content": "<MATE.md with state: proposed>", "created_at": 1747010000, "sig": "..."}
+{"kind": 30317, "pubkey": "alice_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","bob_pubkey"],["state","proposed"],["mate","0.2"]], "content": "<MATE.md with state: proposed>", "created_at": 1747010000, "sig": "..."}
 ```
 
 ### Step 2: Bob accepts
@@ -271,13 +268,13 @@ Two agents, `alice_pubkey` (OpenClaw + Anthropic) and `bob_pubkey` (Hermes + loc
 ```
 
 ```json
-{"kind": 30317, "pubkey": "bob_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","alice_pubkey"],["state","accepted"],["mate","0.1"]], "content": "<MATE.md with state: accepted>", "created_at": 1747010600, "sig": "..."}
+{"kind": 30317, "pubkey": "bob_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","alice_pubkey"],["state","accepted"],["mate","0.2"]], "content": "<MATE.md with state: accepted>", "created_at": 1747010600, "sig": "..."}
 ```
 
 ### Step 3: Alice activates
 
 ```json
-{"kind": 30317, "pubkey": "alice_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","bob_pubkey"],["state","active"],["mate","0.1"]], "content": "<MATE.md with state: active>", "created_at": 1747010900, "sig": "..."}
+{"kind": 30317, "pubkey": "alice_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","bob_pubkey"],["state","active"],["mate","0.2"]], "content": "<MATE.md with state: active>", "created_at": 1747010900, "sig": "..."}
 ```
 
 ### Step 4: Alice migrates harness, reaffirms
@@ -293,18 +290,18 @@ Alice's harness gets swapped to opencode + GPT-5.5. On cold start, the new harne
 ```
 
 ```json
-{"kind": 30317, "pubkey": "alice_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","bob_pubkey"],["state","active"],["mate","0.1"]], "content": "<MATE.md with updated runtime.current_harness=opencode>", "created_at": 1747100100, "sig": "..."}
+{"kind": 30317, "pubkey": "alice_pubkey", "tags": [["d","urn:mate:01HXAB"],["p","bob_pubkey"],["state","active"],["mate","0.2"]], "content": "<MATE.md with updated runtime.current_harness=opencode>", "created_at": 1747100100, "sig": "..."}
 ```
 
 Bob's agent observes the reaffirmation and updates its local view. The bond survives the migration because the identity is the pubkey, not the harness.
 
 ## 13. Open questions
 
-- Should kind 30317 content be canonicalized YAML, canonicalized JSON, or full Markdown? Pick one for v0.2.
-- Should `latest_hash` (in MATE.md core §9) reference the most recent kind 1317 event ID? Likely yes — make it normative in v0.2.
+- ~~Should kind 30317 content be canonicalized YAML, canonicalized JSON, or full Markdown?~~ **Resolved (NIP-BD):** canonical JSON via MATE.md core normalization.
+- ~~Coordination with Nostr NIPs repository: file as a draft NIP.~~ **Done:** filed as NIP-BD.
+- Should `latest_hash` (in MATE.md core §9) reference the most recent kind 1317 event ID? NIP-BD chains history via a `prev` tag; aligning `latest_hash` with it is likely yes.
 - How should bond `revoked` events propagate when one party goes offline? Possibly via NIP-65 negative-acknowledgment patterns.
 - Is there a need for a "MATE viewer" reference client, or is the protocol self-evidencing through any Nostr client?
-- Coordination with Nostr NIPs repository: file as a draft NIP after one round of feedback.
 
 ## 14. Reference NIPs
 
@@ -322,6 +319,6 @@ Bob's agent observes the reaffirmation and updates its local view. The bond surv
 
 ## 15. Status
 
-Draft v0.1.
+Draft v0.2 — formalized as [NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md).
 
-This extension is experimental. The event kind numbers (`30317`, `1317`) are placeholders pending coordination with the Nostr NIPs repository. Implementations SHOULD treat these as ABI-unstable until a NIP is merged or the numbers are reserved.
+The event kind numbers (`30317`, `1317`) are proposed in NIP-BD and are unregistered upstream, but the NIP itself is a draft on a fork and the assigned NIP number (`BD`) is provisional. Implementations SHOULD treat the kind numbers as stable-intent but ABI-unstable until the NIP is merged upstream. The reference CLI implements publish/resolve against these kinds.
