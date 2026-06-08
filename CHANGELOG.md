@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+_Nothing yet._
+
+## 0.3.0 (2026-06-08)
+
+First npm release of `@mate-protocol/core`. Adds the produce side of proofs and
+the Nostr transport on top of the v0.2.0 spec.
+
 ### Added
 - CLI key lifecycle: `mate keygen` (generate an Ed25519 `did:key` identity +
   secret keyfile), `mate sign <file> --key <keyfile>` (append a detached
