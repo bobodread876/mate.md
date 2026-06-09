@@ -13,6 +13,7 @@ export {
 export {
   KIND_BOND_STATE,
   KIND_BOND_HISTORY,
+  BOND_TAG,
   DEFAULT_RELAYS,
   generateNostrKeypair,
   keypairFromSecret,

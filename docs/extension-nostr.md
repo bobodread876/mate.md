@@ -49,6 +49,7 @@ The current state event MAY reference the latest history event via `latest_hash`
     ["d", "<bond.id>"],
     ["p", "<object_pubkey>"],
     ["state", "<bond.state>"],
+    ["t", "mate-bond"],
     ["mate", "0.2"]
   ],
   "content": "<canonicalized MATE.md document or YAML frontmatter>",
@@ -65,7 +66,8 @@ The current state event MAY reference the latest history event via `latest_hash`
 | `d` | Yes | The `bond.id` from MATE.md core. Enables NIP-33 replaceability per bond. |
 | `p` | Yes | The counterparty's Nostr pubkey (hex). One `p` tag per counterparty; usually exactly one. |
 | `state` | Yes | The current `bond.state` value (`proposed`, `accepted`, `active`, `paused`, `revoked`, `archived`). Duplicates `bond.state` in the content; included as a tag for efficient relay-side filtering. |
-| `mate` | Yes | MATE.md core protocol version this event conforms to. |
+| `t` | Yes | Constant discriminator `mate-bond`. Single-letter (NIP-12 `#t`), so it is relay-indexed and queryable. Kinds `30317`/`1317` are **not** allocated in the NIP kind registry, so unrelated apps may reuse them; clients filter `#t: ["mate-bond"]` to resolve only MATE bonds and ignore collisions. |
+| `mate` | Yes | MATE.md core protocol version this event conforms to. (Multi-letter — informational only, not relay-queryable.) |
 | `kind` (tag) | Optional | The `bond.kind` value (`companion`, `collaboration`, etc.). Optional tag for filtering. |
 | `proof` | Optional | DID-to-pubkey proof reference per NIP-39, if the agent has a separate `did:key` identity. |
 
@@ -85,8 +87,9 @@ Implementations MUST be byte-consistent within a single bond — switching repre
   "tags": [
     ["d", "<bond.id>"],
     ["p", "<counterparty_pubkey>"],
-    ["t", "<event_type>"],
-    ["e", "<bond_state_event_id>", "", "root"]
+    ["state", "<transition.to>"],
+    ["t", "mate-bond"],
+    ["prev", "<previous_1317_event_id>"]
   ],
   "content": "<optional context, JSON or text>",
   "pubkey": "<author_pubkey>",
@@ -171,8 +174,9 @@ To verify mutual state:
 2. Object publishes kind 30317 with `["d", "<bond.id>"]`, `["p", "<subject_pubkey>"]`.
 3. Any observer queries:
    ```
-   {"kinds":[30317], "#d":["<bond.id>"]}
+   {"kinds":[30317], "#t":["mate-bond"], "#d":["<bond.id>"]}
    ```
+   The `#t` filter is REQUIRED — it excludes unrelated events that reuse kind 30317 with a colliding `d` tag.
 4. If exactly two events are returned, one from each pubkey, with each `p`-tagging the other, the bond is mutual.
 5. The bond's effective state is `min(subject.state, object.state)` per the lifecycle DAG (e.g. `proposed` + `accepted` → `proposed` until subject also publishes `active`).
 
@@ -187,7 +191,7 @@ Use NIP-65 (Relay List Metadata) for discovering where an agent's MATE events li
 Agents SHOULD publish their MATE-relevant relays in their kind:10002 event. Clients SHOULD:
 
 1. Look up the counterparty's NIP-65 relay list
-2. Query their *write* relays for kind 30317 events tagged `#d=<bond.id>`
+2. Query their *write* relays for kind 30317 events tagged `#t=mate-bond` and `#d=<bond.id>`
 3. Fall back to a small set of well-known public relays if no NIP-65 is found
 
 ## 9. Receiving bonds (inbox / consent at protocol level)

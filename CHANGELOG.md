@@ -4,6 +4,12 @@
 
 _Nothing yet._
 
+## 0.4.0 (2026-06-09)
+
+### Changed (breaking on the Nostr transport)
+
+- Bond events (kinds 30317 + 1317) now carry a constant single-letter discriminator tag `["t", "mate-bond"]`, and bond resolution filters by `#t: ["mate-bond"]`. Kinds 30317/1317 are not allocated in the NIP kind registry, so unrelated apps may reuse them; the `t` tag (NIP-12 indexed, unlike the informational multi-letter `mate` tag) lets clients resolve only MATE bonds and ignore such collisions. Exported as `BOND_TAG`. **Bonds published before 0.4.0 lack the tag and will not resolve under the new `#t` filter — re-publish them.** Event content/canonicalization and proofs are unchanged (the tag is event-level, not part of the signed document).
+
 ## 0.3.0 (2026-06-08)
 
 First npm release of `@mate-protocol/core`. Adds the produce side of proofs and

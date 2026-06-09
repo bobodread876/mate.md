@@ -7,6 +7,7 @@ import yaml from 'js-yaml';
 import { generateEd25519Keypair, signMateDocument } from './keys.js';
 import { normalizeMateDocument } from './normalize.js';
 import {
+  BOND_TAG,
   DEFAULT_RELAYS,
   buildBondHistoryEvent,
   buildBondStateEvent,
@@ -198,7 +199,7 @@ program
       history?: boolean;
     }) => {
       const relays = options.relay.length > 0 ? options.relay : DEFAULT_RELAYS;
-      const filter: RelayFilter = { kinds: [options.history ? 1317 : 30317], limit: 50 };
+      const filter: RelayFilter = { kinds: [options.history ? 1317 : 30317], '#t': [BOND_TAG], limit: 50 };
       if (options.author) filter.authors = [pubkeyHexFromIdentity(options.author)];
       if (options.counterparty) filter['#p'] = [pubkeyHexFromIdentity(options.counterparty)];
       if (options.bond) filter['#d'] = [options.bond];

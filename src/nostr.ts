@@ -11,6 +11,15 @@ secp256k1.hashes.sha256 = sha256;
 export const KIND_BOND_STATE = 30317;
 export const KIND_BOND_HISTORY = 1317;
 
+/**
+ * Single-letter, relay-queryable (NIP-12 `#t`) discriminator marking an event as
+ * a MATE.md bond. Kinds 30317/1317 are not allocated in the NIP kind registry,
+ * so unrelated apps may reuse them; clients filter `#t: [BOND_TAG]` to resolve
+ * only MATE bonds and ignore collisions. (The legacy multi-letter `mate` tag is
+ * informational and NOT queryable.)
+ */
+export const BOND_TAG = 'mate-bond';
+
 export const DEFAULT_RELAYS = [
   'wss://relay.islandbitcoin.com',
   'wss://relay.damus.io',
@@ -153,6 +162,7 @@ export function buildBondStateEvent(
       ['d', doc.bond.id],
       ['p', objectPubkey],
       ['state', String(doc.bond.state)],
+      ['t', BOND_TAG],
       ['mate', doc.mate_version],
     ],
     content: normalizeMateDocument(doc),
@@ -184,6 +194,7 @@ export function buildBondHistoryEvent(
     ['d', doc.bond.id],
     ['p', objectPubkey],
     ['state', transition.to],
+    ['t', BOND_TAG],
     ['mate', doc.mate_version],
   ];
   if (transition.prev) {
@@ -225,6 +236,7 @@ export interface RelayFilter {
   authors?: string[];
   '#d'?: string[];
   '#p'?: string[];
+  '#t'?: string[];
   limit?: number;
 }
 
