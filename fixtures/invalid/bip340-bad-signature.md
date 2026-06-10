@@ -17,7 +17,7 @@ proofs:
     verificationMethod: "did:nostr:npub15ckskhunc8fsc62f45wdng74wnlqmjt9v3dvyj4tfplxu8gr0u6sl2ywqz"
     algorithm: "bip340-schnorr"
     created: "2026-04-23T00:00:00.000000Z"
-    value: "z5TSdxVKYzzaC9dPjCwNtTmgtp2F36zULHSodv9k3jStmNEYbxbaybYXpCcP3rGF7MR27SkcBtgnbCEbVmY7BBwGq"
+    proofValue: "z5TSdxVKYzzaC9dPjCwNtTmgtp2F36zULHSodv9k3jStmNEYbxbaybYXpCcP3rGF7MR27SkcBtgnbCEbVmY7BBwGq"
 ---
 
 # BIP-340 Bad Signature

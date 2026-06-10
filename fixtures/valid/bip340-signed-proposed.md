@@ -17,7 +17,7 @@ proofs:
     verificationMethod: "did:nostr:npub15ckskhunc8fsc62f45wdng74wnlqmjt9v3dvyj4tfplxu8gr0u6sl2ywqz"
     algorithm: "bip340-schnorr"
     created: "2026-04-23T00:00:00.000000Z"
-    value: "zFnUEJFQjJyDYHjcCvhmMXA8BL7x69iggEfwzx1Wi1VBJGQp9sxNxcPg8cbEDcYd37JvnJWsMLxkXVWBWijzpS6r"
+    proofValue: "zFnUEJFQjJyDYHjcCvhmMXA8BL7x69iggEfwzx1Wi1VBJGQp9sxNxcPg8cbEDcYd37JvnJWsMLxkXVWBWijzpS6r"
 ---
 
 # BIP-340 Signed Proposed Bond

@@ -218,23 +218,28 @@ function verifyProofWithErrors(
   const errors: string[] = [];
 
   try {
-    if (!Object.values(ProofAlgorithm).includes(proof.algorithm as ProofAlgorithm)) {
-      errors.push(`unsupported proof algorithm ${String(proof.algorithm)}`);
+    // The proof `type` is the profile identifier (SPEC §12.1); it determines the
+    // algorithm. An explicit `algorithm` field is optional profile metadata.
+    const algorithm = algorithmForProofType(proof.type);
+    if (!algorithm) {
+      errors.push(`unsupported proof type ${String(proof.type)}`);
+      return { valid: false, errors };
+    }
+    if (proof.algorithm && proof.algorithm !== algorithm) {
+      errors.push(`algorithm ${String(proof.algorithm)} contradicts proof type ${proof.type}`);
       return { valid: false, errors };
     }
 
     const resolved = resolveDid(proof.verificationMethod);
-    if (resolved.algorithm !== proof.algorithm) {
-      errors.push(
-        `verificationMethod resolves to ${resolved.algorithm}, not ${String(proof.algorithm)}`,
-      );
+    if (resolved.algorithm !== algorithm) {
+      errors.push(`verificationMethod resolves to ${resolved.algorithm}, not ${algorithm}`);
       return { valid: false, errors };
     }
 
-    const signature = decodeProofValue(proof.value);
+    const signature = decodeProofValue(proof.proofValue);
     const canonicalBytes = new TextEncoder().encode(normalizeMateDocument(doc));
     const verified =
-      proof.algorithm === ProofAlgorithm.Ed25519
+      algorithm === ProofAlgorithm.Ed25519
         ? ed25519.verify(signature, canonicalBytes, resolved.publicKey)
         : secp256k1.schnorr.verify(signature, sha256(canonicalBytes), resolved.publicKey);
 
@@ -246,6 +251,17 @@ function verifyProofWithErrors(
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+function algorithmForProofType(type: string): ProofAlgorithm | null {
+  switch (type) {
+    case 'Ed25519Signature2026':
+      return ProofAlgorithm.Ed25519;
+    case 'BIP340Signature2026':
+      return ProofAlgorithm.Bip340Schnorr;
+    default:
+      return null;
+  }
 }
 
 function decodeProofValue(value: string): Uint8Array {

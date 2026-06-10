@@ -77,9 +77,11 @@ export interface Runtime {
 export interface Proof {
   type: string;
   verificationMethod: string;
-  algorithm: ProofAlgorithm | `${ProofAlgorithm}`;
   created: string;
-  value: string;
+  /** Multibase z-prefixed base58btc signature (SPEC §12.1). */
+  proofValue: string;
+  /** Optional profile metadata; the proof `type` is authoritative for the algorithm. */
+  algorithm?: ProofAlgorithm | `${ProofAlgorithm}`;
   [extensionField: string]: unknown;
 }
 

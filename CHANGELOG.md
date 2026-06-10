@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.5.0 (2026-06-09)
+
+### Added — private bonds (NIP-44 / NIP-59)
+
+- **Private bond transport** (`docs/extension-nostr.md` §13): bonds can now be
+  gift-wrapped instead of published publicly. The kind 30317/1317 event stays an
+  unsigned NIP-59 *rumor*, sealed (kind 13, signed by the real author) and
+  gift-wrapped (kind 1059, signed by a one-time key) once for the counterparty
+  and once for the author (copy-to-self). Relays see only an ephemeral author,
+  the recipient's `p` tag, and a fuzzed timestamp — no bond id, state,
+  counterparty linkage, or `t=mate-bond` discriminator.
+- `src/nip44.ts` — NIP-44 v2 encryption (secp256k1 ECDH → HKDF-SHA256 →
+  ChaCha20 + HMAC-SHA256), verified against the official test vectors
+  (`fixtures/vectors/nip44.vectors.json`, checksum pinned in the NIP). One new
+  dependency: `@noble/ciphers`.
+- `src/giftwrap.ts` — NIP-59 `createRumor` / `sealRumor` / `wrapSeal` /
+  `wrapRumor` / `unwrapGiftWrap` (authenticating seal signature, author match,
+  and rumor id), plus bond-level `buildPrivateBondEvents` and
+  `selectBondRumors`.
+- `signMateDocumentNostr` — detached `BIP340Signature2026` proof over the
+  canonical document for `did:nostr` identities (SPEC §12.3), the counterpart
+  of the Ed25519 `signMateDocument`. **Private bonds require an embedded
+  document proof** — rumors are unsigned, so the embedded proof is the only
+  authorship evidence that survives disclosure; `buildPrivateBondEvents`
+  enforces this and appends `proofs` to the encrypted content.
+- CLI: `mate nostr-bond --private` (sign + wrap + publish both gift wraps) and
+  `mate nostr-inbox --key <keyfile>` (fetch kind 1059 by `#p`, unwrap,
+  authenticate, and project bond rumors).
+
+### Changed (spec conformance — breaking for local documents with proofs)
+
+- Proof objects now use `proofValue` (SPEC §12.1) instead of the legacy
+  `value` field; `algorithm` is now optional profile metadata derived from the
+  proof `type`. Schema, fixtures, and both signers updated. Signatures
+  themselves are unaffected (`proofs` is excluded from canonical bytes), but
+  documents written with the old field name need the key renamed to
+  re-validate. Published Nostr events are unaffected (canonical content never
+  included `proofs`).
+
 ## Unreleased
 
 _Nothing yet._

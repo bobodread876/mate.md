@@ -17,7 +17,7 @@ proofs:
     verificationMethod: "did:key:z6MkfkzzRPZmuRPRjBSHV1yuTty14vwL3hZRv5JNmgnqQrFc"
     algorithm: "ed25519"
     created: "2026-04-23T00:00:00.000000Z"
-    value: "z4jXtLqottiy2WB7W6JLuXGViqoW1CHoQzfs3iQ11iqLriJctEfPCN73JbotPmQkB2RpxZYqHxr1aMPN4j1yuRqcD"
+    proofValue: "z4jXtLqottiy2WB7W6JLuXGViqoW1CHoQzfs3iQ11iqLriJctEfPCN73JbotPmQkB2RpxZYqHxr1aMPN4j1yuRqcD"
 ---
 
 # Ed25519 Bad Signature

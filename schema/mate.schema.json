@@ -26,11 +26,21 @@
           "minLength": 1
         },
         "profile": {
-          "type": ["object", "null"],
-          "required": ["uri", "type"],
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "uri",
+            "type"
+          ],
           "properties": {
-            "uri": { "type": "string" },
-            "type": { "type": "string" }
+            "uri": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
           },
           "additionalProperties": false
         }
@@ -48,11 +58,21 @@
           "minLength": 1
         },
         "profile": {
-          "type": ["object", "null"],
-          "required": ["uri", "type"],
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "uri",
+            "type"
+          ],
           "properties": {
-            "uri": { "type": "string" },
-            "type": { "type": "string" }
+            "uri": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
           },
           "additionalProperties": false
         }
@@ -86,14 +106,23 @@
           ]
         },
         "kind": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "created_at": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         },
         "updated_at": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         }
       },
@@ -101,47 +130,96 @@
     },
     "consent": {
       "type": "object",
-      "required": ["revocable"],
+      "required": [
+        "revocable"
+      ],
       "properties": {
-        "required": { "type": "boolean" },
-        "mutual": { "type": "boolean" },
-        "revocable": { "type": "boolean" },
-        "unilateral_exit_allowed": { "type": "boolean" },
+        "required": {
+          "type": "boolean"
+        },
+        "mutual": {
+          "type": "boolean"
+        },
+        "revocable": {
+          "type": "boolean"
+        },
+        "unilateral_exit_allowed": {
+          "type": "boolean"
+        },
         "accepted_at": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         },
         "revoked_at": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         },
         "withdrawn_at": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         },
         "rejected_at": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         },
         "expired_at": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         }
       },
       "additionalProperties": false
     },
     "policies": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": {
-        "type": ["string", "null"]
+        "type": [
+          "string",
+          "null"
+        ]
       }
     },
     "events": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "properties": {
-        "uri": { "type": ["string", "null"] },
-        "type": { "type": ["string", "null"] },
-        "latest_hash": { "type": ["string", "null"] }
+        "uri": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "latest_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
       "additionalProperties": false
     },
@@ -149,28 +227,66 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["type", "verificationMethod", "algorithm", "created", "value"],
+        "required": [
+          "type",
+          "verificationMethod",
+          "created",
+          "proofValue"
+        ],
         "properties": {
-          "type": { "type": "string" },
-          "verificationMethod": { "type": "string" },
-          "algorithm": { "type": "string", "enum": ["ed25519", "bip340-schnorr"] },
-          "created": { "type": "string", "format": "date-time" },
-          "value": { "type": "string" }
+          "type": {
+            "type": "string"
+          },
+          "verificationMethod": {
+            "type": "string"
+          },
+          "algorithm": {
+            "type": "string",
+            "enum": [
+              "ed25519",
+              "bip340-schnorr"
+            ]
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "proofValue": {
+            "type": "string"
+          }
         },
         "additionalProperties": true
       }
     },
     "runtime": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "properties": {
-        "current_model": { "type": ["string", "null"] },
-        "current_harness": { "type": ["string", "null"] },
-        "runtime_is_authoritative": { "type": "boolean" }
+        "current_model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "current_harness": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "runtime_is_authoritative": {
+          "type": "boolean"
+        }
       },
       "additionalProperties": false
     },
     "extensions": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": true
     }
   },
