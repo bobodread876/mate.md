@@ -25,6 +25,9 @@ export {
   verifyEvent,
   buildBondStateEvent,
   buildBondHistoryEvent,
+  buildUnsignedBondStateEvent,
+  buildUnsignedBondHistoryEvent,
+  signMateDocumentNostr,
   publishEvent,
   resolveEvents,
   type NostrKeypair,
@@ -34,4 +37,22 @@ export {
   type PublishResult,
   type ResolveResult,
   type Transition,
+  type NostrSignOptions,
 } from './nostr.js';
+export { getConversationKey, nip44Encrypt, nip44Decrypt } from './nip44.js';
+export {
+  KIND_SEAL,
+  KIND_GIFT_WRAP,
+  createRumor,
+  sealRumor,
+  wrapSeal,
+  wrapRumor,
+  unwrapGiftWrap,
+  buildPrivateBondEvents,
+  selectBondRumors,
+  type Rumor,
+  type UnwrappedRumor,
+  type PrivateBondEvents,
+  type PrivateBondOptions,
+  type PrivateBondRumor,
+} from './giftwrap.js';

@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { Command } from 'commander';
 import yaml from 'js-yaml';
 
+import { KIND_GIFT_WRAP, buildPrivateBondEvents, selectBondRumors } from './giftwrap.js';
 import { generateEd25519Keypair, signMateDocument } from './keys.js';
 import { normalizeMateDocument } from './normalize.js';
 import {
@@ -17,6 +18,7 @@ import {
   publishEvent,
   resolveEvents,
   secretFromNsec,
+  signMateDocumentNostr,
   verifyEvent,
   type NostrEvent,
   type RelayFilter,
@@ -232,6 +234,7 @@ program
   .option('--created-at <ts>', 'bond.created_at ISO 8601 (defaults to now)')
   .option('-r, --relay <url>', 'relay URL (repeatable; defaults to public relays)', collectRelay, [])
   .option('--history', 'also publish a kind 1317 history event')
+  .option('--private', 'gift-wrap the bond (NIP-59) instead of publishing it publicly')
   .option('--out <file>', 'also write the assembled MATE.md document to <file>')
   .option('--dry-run', 'assemble + validate + print the canonical doc, do not publish')
   .action(
@@ -244,6 +247,7 @@ program
       createdAt?: string;
       relay: string[];
       history?: boolean;
+      private?: boolean;
       out?: string;
       dryRun?: boolean;
     }) => {
@@ -254,6 +258,11 @@ program
       pubkeyHexFromIdentity(options.counterparty);
 
       const doc = makeBondDoc(subjectDid, options.counterparty, options);
+      if (options.private) {
+        // Rumors are unsigned; the embedded proof is what a disclosed private
+        // bond verifies against.
+        doc.proofs = [signMateDocumentNostr(doc, secret)];
+      }
 
       const result = validateMateDocument(doc);
       if (!result.valid) {
@@ -274,6 +283,24 @@ program
       const relays = options.relay.length > 0 ? options.relay : DEFAULT_RELAYS;
       const createdAt = Math.floor(Date.now() / 1000);
 
+      if (options.private) {
+        const events = buildPrivateBondEvents(doc, secret, { createdAt });
+        const toCounterparty = await publishEvent(relays, events.toCounterparty);
+        const toSelf = await publishEvent(relays, events.toSelf);
+        console.log(
+          JSON.stringify({
+            private: true,
+            state: doc.bond.state,
+            rumor: events.rumor.id,
+            wraps: [
+              { id: events.toCounterparty.id, to: 'counterparty', relays: toCounterparty },
+              { id: events.toSelf.id, to: 'self', relays: toSelf },
+            ],
+          }),
+        );
+        return;
+      }
+
       const stateEvent = buildBondStateEvent(doc, secret, { createdAt });
       const stateResults = await publishEvent(relays, stateEvent);
       console.log(
@@ -292,6 +319,41 @@ program
       }
     },
   );
+
+program
+  .command('nostr-inbox')
+  .description('Resolve private (gift-wrapped) bonds addressed to a key and unwrap them')
+  .requiredOption('-k, --key <keyfile>', 'Nostr keyfile (the recipient identity)')
+  .option('-b, --bond <bond_id>', 'only show rumors for this bond id')
+  .option('-r, --relay <url>', 'relay URL (repeatable; defaults to public relays)', collectRelay, [])
+  .action(async (options: { key: string; bond?: string; relay: string[] }) => {
+    const keyfile = JSON.parse(readFileSync(options.key, 'utf8')) as { nsec: string };
+    const secret = secretFromNsec(keyfile.nsec);
+    const selfHex = keypairFromSecret(secret).pubkeyHex;
+    const relays = options.relay.length > 0 ? options.relay : DEFAULT_RELAYS;
+
+    // Gift wraps carry no bond metadata by design — fetch the whole inbox and
+    // filter after unwrapping.
+    const { events, relaysReached } = await resolveEvents(relays, {
+      kinds: [KIND_GIFT_WRAP],
+      '#p': [selfHex],
+      limit: 200,
+    });
+
+    const rumors = selectBondRumors(events, secret)
+      .filter((r) => !options.bond || r.bond === options.bond)
+      .sort((a, b) => b.rumor.created_at - a.rumor.created_at)
+      .map((r) => ({
+        rumor: r.rumor.id,
+        author: r.author,
+        bond: r.bond,
+        counterparty: r.counterparty,
+        state: r.state,
+        created_at: r.rumor.created_at,
+      }));
+
+    console.log(JSON.stringify({ relaysReached, wraps: events.length, bonds: rumors.length, events: rumors }, null, 2));
+  });
 
 /** Assemble a MATE.md document from bond parameters, filling the consent timestamp the state requires. */
 function makeBondDoc(

@@ -17,7 +17,7 @@ proofs:
     verificationMethod: "did:key:z6MkfkzzRPZmuRPRjBSHV1yuTty14vwL3hZRv5JNmgnqQrFc"
     algorithm: "ed25519"
     created: "2026-04-23T00:00:00.000000Z"
-    value: "z5JmFkCsdmUqr553VWdGbANKKqFbtUY6BDWftPWCCwPcsi8pvcdz3zJb4Ey7A6gfF61tnuXboBFhzTs3RqSthdsbB"
+    proofValue: "z5JmFkCsdmUqr553VWdGbANKKqFbtUY6BDWftPWCCwPcsi8pvcdz3zJb4Ey7A6gfF61tnuXboBFhzTs3RqSthdsbB"
 ---
 
 # Ed25519-Signed Proposed Bond

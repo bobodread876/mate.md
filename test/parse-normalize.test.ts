@@ -55,7 +55,7 @@ proofs:
     verificationMethod: "did:key:z6MkFake"
     algorithm: "ed25519"
     created: "2026-04-23T00:20:00Z"
-    value: "ZmFrZQ=="
+    proofValue: "ZmFrZQ=="
 ---
 `);
 

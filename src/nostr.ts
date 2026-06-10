@@ -1,10 +1,10 @@
 import * as secp256k1 from '@noble/secp256k1';
 import { sha256 } from '@noble/hashes/sha2.js';
-import { bech32 } from '@scure/base';
+import { base58, bech32 } from '@scure/base';
 
 import { resolveDid } from './did.js';
 import { normalizeMateDocument } from './normalize.js';
-import { ProofAlgorithm, type MateDocument } from './types.js';
+import { ProofAlgorithm, type MateDocument, type Proof } from './types.js';
 
 secp256k1.hashes.sha256 = sha256;
 
@@ -92,6 +92,37 @@ function resolveDidNostrPubkey(did: string): Uint8Array {
   return resolved.publicKey;
 }
 
+export interface NostrSignOptions {
+  /** Override the proof `created` timestamp (defaults to now). */
+  created?: string;
+}
+
+/**
+ * Produce a detached BIP-340 proof (SPEC §12.3) over the canonical form of
+ * `doc`, verifiable via the signer's did:nostr identity. Counterpart of
+ * keys.ts' Ed25519 signMateDocument. Private bonds embed this proof so the
+ * document stays verifiable after gift-wrapping — NIP-59 rumors are unsigned,
+ * so the embedded proof is the only authorship evidence that survives
+ * disclosure to a third party.
+ */
+export function signMateDocumentNostr(
+  doc: MateDocument,
+  secret: Uint8Array,
+  options: NostrSignOptions = {},
+): Proof {
+  const { did } = keypairFromSecret(secret);
+  const canonicalBytes = new TextEncoder().encode(normalizeMateDocument(doc));
+  const signature = secp256k1.schnorr.sign(sha256(canonicalBytes), secret);
+
+  return {
+    type: 'BIP340Signature2026',
+    verificationMethod: did,
+    algorithm: ProofAlgorithm.Bip340Schnorr,
+    created: options.created ?? new Date().toISOString(),
+    proofValue: `z${base58.encode(signature)}`,
+  };
+}
+
 // --- Events -----------------------------------------------------------------
 
 export interface UnsignedEvent {
@@ -145,17 +176,20 @@ export interface BuildOptions {
   createdAt: number;
 }
 
-/** Build a signed kind:30317 current bond-state event from a MATE.md document. */
-export function buildBondStateEvent(
+/**
+ * Build the unsigned kind:30317 current bond-state event for `authorPubkeyHex`.
+ * The public transport signs this (becoming a regular event); the private
+ * transport keeps it unsigned as a NIP-59 rumor and wraps it instead.
+ */
+export function buildUnsignedBondStateEvent(
   doc: MateDocument,
-  secret: Uint8Array,
+  authorPubkeyHex: string,
   options: BuildOptions,
-): NostrEvent {
-  const pubkey = toHex(secp256k1.schnorr.getPublicKey(secret));
+): UnsignedEvent {
   const objectPubkey = pubkeyHexFromIdentity(doc.object.id);
 
-  const unsigned: UnsignedEvent = {
-    pubkey,
+  return {
+    pubkey: authorPubkeyHex,
     created_at: options.createdAt,
     kind: KIND_BOND_STATE,
     tags: [
@@ -167,8 +201,16 @@ export function buildBondStateEvent(
     ],
     content: normalizeMateDocument(doc),
   };
+}
 
-  return finalizeEvent(unsigned, secret);
+/** Build a signed kind:30317 current bond-state event from a MATE.md document. */
+export function buildBondStateEvent(
+  doc: MateDocument,
+  secret: Uint8Array,
+  options: BuildOptions,
+): NostrEvent {
+  const pubkey = toHex(secp256k1.schnorr.getPublicKey(secret));
+  return finalizeEvent(buildUnsignedBondStateEvent(doc, pubkey, options), secret);
 }
 
 export interface Transition {
@@ -180,14 +222,13 @@ export interface Transition {
   prev?: string;
 }
 
-/** Build a signed kind:1317 append-only history event. */
-export function buildBondHistoryEvent(
+/** Build the unsigned kind:1317 history event (see buildUnsignedBondStateEvent). */
+export function buildUnsignedBondHistoryEvent(
   doc: MateDocument,
-  secret: Uint8Array,
+  authorPubkeyHex: string,
   transition: Transition,
   options: BuildOptions,
-): NostrEvent {
-  const pubkey = toHex(secp256k1.schnorr.getPublicKey(secret));
+): UnsignedEvent {
   const objectPubkey = pubkeyHexFromIdentity(doc.object.id);
 
   const tags: string[][] = [
@@ -212,15 +253,24 @@ export function buildBondHistoryEvent(
     record.reason = transition.reason;
   }
 
-  const unsigned: UnsignedEvent = {
-    pubkey,
+  return {
+    pubkey: authorPubkeyHex,
     created_at: options.createdAt,
     kind: KIND_BOND_HISTORY,
     tags,
     content: JSON.stringify(record),
   };
+}
 
-  return finalizeEvent(unsigned, secret);
+/** Build a signed kind:1317 append-only history event. */
+export function buildBondHistoryEvent(
+  doc: MateDocument,
+  secret: Uint8Array,
+  transition: Transition,
+  options: BuildOptions,
+): NostrEvent {
+  const pubkey = toHex(secp256k1.schnorr.getPublicKey(secret));
+  return finalizeEvent(buildUnsignedBondHistoryEvent(doc, pubkey, transition, options), secret);
 }
 
 // --- Transport (built-in WebSocket) -----------------------------------------

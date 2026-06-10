@@ -133,11 +133,11 @@ mate.md/
 
 [![npm](https://img.shields.io/npm/v/@mate-protocol/core)](https://www.npmjs.com/package/@mate-protocol/core)
 
-**v0.2.0 is released.** All three phases complete:
+**v0.2.0 spec is released; the reference implementation is at v0.5.0.** All three phases complete:
 
 1. **Spec (Phase 1)** — 649-line normative SPEC.md with 10-state machine, canonicalization, dual proof profiles
-2. **Reference impl (Phase 2)** — `@mate-protocol/core` npm package with parse, normalize, validate (real Ed25519 + BIP-340 crypto), CLI
-3. **Conformance (Phase 3)** — 34 passing tests, 27/27 fixtures, GitHub Actions CI
+2. **Reference impl (Phase 2)** — `@mate-protocol/core` npm package with parse, normalize, validate (real Ed25519 + BIP-340 crypto), keygen/sign/verify, Nostr transport (public kind 30317/1317 + private NIP-59 gift wrap), CLI
+3. **Conformance (Phase 3)** — 58 passing tests (incl. the official NIP-44 vector suite), 27/27 fixtures, GitHub Actions CI
 
 Spec released under the [MIT License](LICENSE).
 
@@ -151,6 +151,14 @@ npx @mate-protocol/core validate path/to/MATE.md
 
 # Inspect canonical form
 npx @mate-protocol/core inspect path/to/MATE.md
+
+# Generate a Nostr identity and declare a bond — public, or private (NIP-59 gift wrap)
+npx @mate-protocol/core keygen --nostr --out agent.key
+npx @mate-protocol/core nostr-bond -k agent.key -c npub1... -b "urn:mate:..." -s proposed
+npx @mate-protocol/core nostr-bond -k agent.key -c npub1... -b "urn:mate:..." -s proposed --private
+
+# Read your private bond inbox (unwrap + authenticate kind 1059 gift wraps)
+npx @mate-protocol/core nostr-inbox -k agent.key
 
 # Programmatic API
 import { parseMateDocument, validateMateDocument } from '@mate-protocol/core';
