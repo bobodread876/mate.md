@@ -218,6 +218,14 @@ export interface Transition {
   to: string;
   at: string;
   reason?: string;
+  /**
+   * Lifecycle event type (extension §5.2), e.g. "bond.reaffirmed". Added as a
+   * second queryable `t` tag alongside the `mate-bond` discriminator and as a
+   * `type` field in the content record. A reaffirmation is `from: "active",
+   * to: "active", type: "bond.reaffirmed"` — the author choosing the bond
+   * again, which is what makes longevity legible.
+   */
+  type?: string;
   /** Event id of the previous kind:1317 for this bond, if any. */
   prev?: string;
 }
@@ -238,6 +246,12 @@ export function buildUnsignedBondHistoryEvent(
     ['t', BOND_TAG],
     ['mate', doc.mate_version],
   ];
+  if (transition.type) {
+    // Second t tag: relay-queryable lifecycle event type. Nostr filter values
+    // are OR'd, so clients select reaffirmations with #t:["bond.reaffirmed"]
+    // (+ #d) rather than combining it with the mate-bond discriminator.
+    tags.push(['t', transition.type]);
+  }
   if (transition.prev) {
     tags.push(['prev', transition.prev]);
   }
@@ -249,6 +263,9 @@ export function buildUnsignedBondHistoryEvent(
     to: transition.to,
     at: transition.at,
   };
+  if (transition.type) {
+    record.type = transition.type;
+  }
   if (transition.reason) {
     record.reason = transition.reason;
   }

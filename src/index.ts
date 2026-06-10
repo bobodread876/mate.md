@@ -49,6 +49,7 @@ export {
   wrapRumor,
   unwrapGiftWrap,
   buildPrivateBondEvents,
+  buildPrivateBondHistoryEvents,
   selectBondRumors,
   type Rumor,
   type UnwrappedRumor,

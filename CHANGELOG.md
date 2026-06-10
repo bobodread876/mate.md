@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0 (2026-06-10)
+
+### Added — typed lifecycle events & private history
+
+- `Transition.type` (e.g. `"bond.reaffirmed"`): kind 1317 events can carry
+  their lifecycle event type as a second queryable `t` tag (extension §5.2)
+  and a `type` field in the content record. Reaffirmation — the author
+  choosing the bond again (`from: "active", to: "active"`) — is the longevity
+  signal the protocol exists to make legible.
+- `buildPrivateBondHistoryEvents` — gift-wrapped kind 1317 rumors
+  (counterparty + copy-to-self) so private bonds get lifecycle history without
+  touching the public graph (extension §13.6b). History rumors carry a
+  transition record, not a document, so the §13.3 embedded-proof rule does
+  not apply; the verified seal authenticates them for the two parties.
+
 ## 0.5.0 (2026-06-09)
 
 ### Added — private bonds (NIP-44 / NIP-59)

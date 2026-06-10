@@ -98,9 +98,20 @@ Implementations MUST be byte-consistent within a single bond — switching repre
 }
 ```
 
-### 5.2 Recommended event types (`t` tag)
+### 5.2 Recommended event types (second `t` tag)
 
-Mirror the MATE.md core §10 event types:
+A kind 1317 event MAY carry its lifecycle event type as a **second** `t` tag,
+alongside the required `t=mate-bond` discriminator, and as a `type` field in
+the content record. Nostr filter values are OR'd, so clients select a specific
+type with `#t:["bond.reaffirmed"]` (plus `#d`), and the general bond sweep with
+`#t:["mate-bond"]` — the two tags coexist on one event.
+
+`bond.reaffirmed` deserves special mention: it records the author *choosing
+the bond again* (`from: "active", to: "active", type: "bond.reaffirmed"`).
+Reaffirmations are the longevity signal — a bond reaffirmed by both parties
+across time is evidence the relationship lasted, not just started.
+
+Types mirror the MATE.md core §10 event types:
 
 - `bond.proposed`
 - `bond.accepted`
@@ -409,6 +420,16 @@ Not hidden:
 - A private bond, once disclosed by either party, is disclosed — the embedded
   proof (§13.3) makes the disclosure verifiable, and nothing makes it
   revocable. Parties SHOULD treat disclosure as one-way.
+
+### 13.6b Private lifecycle events
+
+Kind 1317 lifecycle events (e.g. `bond.reaffirmed`) on a private bond use the
+same rumor + seal + wrap construction as §13.1, wrapped to the counterparty
+and to self. History rumors carry a transition record rather than a MATE.md
+document, so the §13.3 embedded-proof rule does not apply: their authenticity
+is established for the two parties by the verified seal during unwrap. They
+are not designed for third-party disclosure — to prove a private bond to a
+verifier, disclose the proof-carrying state document, not its history.
 
 ### 13.7 Public ↔ private transitions
 

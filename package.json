@@ -1,6 +1,6 @@
 {
   "name": "@mate-protocol/core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Reference implementation for the MATE.md v0.2 protocol.",
   "license": "MIT",
   "type": "module",
