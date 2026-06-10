@@ -17,6 +17,7 @@ import { getConversationKey, nip44Decrypt, nip44Encrypt } from './nip44.js';
 import {
   KIND_BOND_HISTORY,
   KIND_BOND_STATE,
+  buildUnsignedBondHistoryEvent,
   buildUnsignedBondStateEvent,
   computeEventId,
   finalizeEvent,
@@ -24,6 +25,7 @@ import {
   pubkeyHexFromIdentity,
   verifyEvent,
   type NostrEvent,
+  type Transition,
   type UnsignedEvent,
 } from './nostr.js';
 import type { MateDocument } from './types.js';
@@ -191,6 +193,32 @@ export function buildPrivateBondEvents(
     proofs: doc.proofs,
   });
   const rumor = createRumor(unsigned);
+  return {
+    rumor,
+    toCounterparty: wrapRumor(rumor, secret, counterpartyPubkey),
+    toSelf: wrapRumor(rumor, secret, pubkeyHex),
+  };
+}
+
+/**
+ * Build the private transport form of a kind:1317 lifecycle event (e.g. a
+ * reaffirmation), wrapped for the counterparty and for the author. History
+ * rumors carry a transition record, not a MATE document, so the embedded-proof
+ * rule does not apply: their authenticity is established for the two parties
+ * by the verified seal during unwrap, and they are not designed for
+ * third-party disclosure (disclose the state document instead).
+ */
+export function buildPrivateBondHistoryEvents(
+  doc: MateDocument,
+  secret: Uint8Array,
+  transition: Transition,
+  options: PrivateBondOptions = {},
+): PrivateBondEvents {
+  const { pubkeyHex } = keypairFromSecret(secret);
+  const counterpartyPubkey = pubkeyHexFromIdentity(doc.object.id);
+  const createdAt = options.createdAt ?? Math.floor(Date.now() / 1000);
+
+  const rumor = createRumor(buildUnsignedBondHistoryEvent(doc, pubkeyHex, transition, { createdAt }));
   return {
     rumor,
     toCounterparty: wrapRumor(rumor, secret, counterpartyPubkey),
