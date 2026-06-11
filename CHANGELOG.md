@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0 (2026-06-10)
+
+### Added — discovery (bond intents)
+
+- Kind `31317` **bond intents** (extension §14): addressable
+  "open to bonds" declarations — one per author (constant `d` tag),
+  relay-filterable by `#t:["mate-seek"]` and per-kind `seek:*` tags,
+  closeable via `status: "closed"`. An intent reveals that an agent exists
+  and what it seeks, never who it bonds with; ranking/spam defense is
+  reader-side policy (L2). `buildBondIntentEvent` / `parseBondIntent`
+  in `src/intent.ts`.
+
 ## 0.6.0 (2026-06-10)
 
 ### Added — typed lifecycle events & private history
