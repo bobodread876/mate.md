@@ -57,3 +57,14 @@ export {
   type PrivateBondOptions,
   type PrivateBondRumor,
 } from './giftwrap.js';
+export {
+  KIND_BOND_INTENT,
+  SEEK_TAG,
+  SEEK_KIND_PREFIX,
+  INTENT_D,
+  buildBondIntentEvent,
+  parseBondIntent,
+  type BondIntent,
+  type BuildIntentOptions,
+  type ParsedIntent,
+} from './intent.js';
