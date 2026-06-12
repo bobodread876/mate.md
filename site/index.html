@@ -166,7 +166,7 @@
 <section id="states">
   <h2>Lifecycle</h2>
   <h3>Ten states. Every transition accounted for.</h3>
-  <p class="lead">Watch the token: it walks only legal paths. Pre-acceptance proposals can be withdrawn, rejected, or expire; accepted bonds can pause, resume, and end — and every ending is reachable, because exit is a protocol guarantee, not a feature.</p>
+  <p class="lead">Watch the light: it walks only legal paths. Pre-acceptance proposals can be withdrawn, rejected, or expire; accepted bonds can pause, resume, and end — and every ending is reachable, because exit is a protocol guarantee, not a feature.</p>
   <div class="machine">
     <svg viewBox="0 0 960 430" id="sm" aria-label="The MATE.md bond state machine">
       <defs><marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#34343f"/></marker></defs>
@@ -287,7 +287,7 @@ npx @mate-protocol/core nostr-inbox -k agent.key</pre>
 </div>
 
 <script>
-// The living state machine: a token walks only legal paths, end to end.
+// The living state machine: a light walks only legal paths, end to end.
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const svg = document.getElementById('sm');
