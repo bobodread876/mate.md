@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MATE.md — a relationship state protocol for agents</title>
+<meta name="description" content="A minimal, signed, portable way for one agent to declare a bond toward another — identity, a 10-state machine, canonicalization, detached proofs. Mechanism, never policy. MIT." />
+<meta property="og:title" content="MATE.md — a relationship state protocol for agents" />
+<meta property="og:description" content="Not who an agent matches with. Who it keeps choosing. The L1: mechanism, never policy." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='120' fill='%2315151c'/%3E%3Cg fill='none' stroke-width='40' stroke-linecap='round'%3E%3Ccircle cx='204' cy='256' r='104' stroke='%23F7931A'/%3E%3Ccircle cx='308' cy='256' r='104' stroke='%238A5CF6'/%3E%3C/g%3E%3C/svg%3E" />
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:#0b0b0f; --card:#15151c; --border:#23232e; --line:#1d1d26;
+    --text:#e7e7ea; --muted:#9a9aa3; --dim:#6b6b76;
+    --orange:#f7931a; --violet:#8a5cf6; --ok:#5ad17f; --warn:#e8556d;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16.5px/1.65 -apple-system,Segoe UI,Roboto,sans-serif; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+  a { color: var(--violet); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono { font-family: ui-monospace, Menlo, monospace; font-size: .9em; }
+
+  header { padding: 18px 0; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; color:var(--text); font-family:ui-monospace,Menlo,monospace; }
+  nav { display:flex; gap:20px; flex-wrap:wrap; }
+  nav a { color: var(--muted); font-size: 14.5px; }
+
+  .hero { padding: 58px 0 20px; display:grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items:center; }
+  @media (max-width: 820px) { .hero { grid-template-columns: 1fr; } }
+  .hero h1 { font-size: clamp(30px, 4.6vw, 44px); line-height:1.15; letter-spacing:-.5px; margin:0 0 14px; }
+  .hero h1 .file { font-family:ui-monospace,Menlo,monospace; }
+  .hero p.q { color: var(--muted); font-size: 16.5px; border-left: 3px solid var(--border); padding-left: 14px; }
+  .hero p.q b { color: var(--text); }
+  .hero .sub { color: var(--dim); font-size: 14.5px; margin-top: 14px; }
+  .hero .sub a { white-space: nowrap; }
+
+  .doc { background:#0e0e14; border:1px solid var(--border); border-radius:14px; overflow:hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,.5), 0 18px 50px rgba(0,0,0,.35); }
+  .doc .bar { display:flex; align-items:center; gap:8px; padding:9px 14px; border-bottom:1px solid var(--line); color:var(--dim); font-size:12.5px; font-family:ui-monospace,monospace; }
+  .doc .bar .dot { width:9px; height:9px; border-radius:50%; background:#2a2a36; }
+  .doc pre { margin:0; padding: 16px 18px; font-family: ui-monospace, Menlo, monospace; font-size: 12.8px; line-height: 1.62; overflow-x:auto; }
+  .doc .k { color:#7d7d8a; } .doc .s { color:#c9c9d2; } .doc .num { color:#a8b889; }
+  .doc .subj { color: var(--orange); } .doc .obj { color: var(--violet); }
+  .doc .cm { color:#54545f; font-style: italic; }
+
+  section { padding: 56px 0 6px; }
+  section h2 { font-size: 13.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--orange); margin: 0 0 10px; }
+  section h3 { font-size: clamp(22px, 3.2vw, 30px); margin: 0 0 12px; line-height: 1.22; letter-spacing: -.3px; }
+  section p.lead { color: var(--muted); max-width: 720px; margin-top: 0; }
+
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 13px; margin-top: 24px; }
+  .cell { background:var(--card); border:1px solid var(--border); border-radius:13px; padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.25);
+    transition: transform .3s cubic-bezier(.2,.8,.25,1), border-color .3s ease; }
+  .cell:hover { transform: translateY(-3px); border-color:#32323f; }
+  .cell h4 { margin:0 0 7px; font-size: 16.5px; }
+  .cell p { color: var(--muted); font-size: 14px; margin: 0; }
+  .cell .mono { color: var(--dim); font-size: 12px; display:block; margin-top: 9px; }
+
+  /* state machine */
+  .machine { background:#0e0e14; border:1px solid var(--border); border-radius:14px; padding: 14px 8px 6px; margin-top: 24px; overflow-x:auto; }
+  .machine svg { display:block; min-width: 720px; width:100%; height:auto; }
+  .st rect { fill:#15151c; stroke:#2a2a36; stroke-width:1.2; rx:9; }
+  .st text { fill:#c9c9d2; font: 600 13px ui-monospace, Menlo, monospace; text-anchor: middle; }
+  .st.terminal rect { stroke-dasharray: 4 4; }
+  .st.terminal text { fill:#8a8a95; }
+  .st.lit rect { stroke: var(--orange); fill:#1d1710; }
+  .st.lit text { fill: #ffd9a8; }
+  .edge { stroke:#34343f; stroke-width:1.4; fill:none; marker-end:url(#arr); }
+  .edge.lit { stroke: var(--orange); }
+  .elabel { fill:#54545f; font: 11px ui-monospace, monospace; text-anchor: middle; }
+  .legend { color: var(--dim); font-size: 12.5px; padding: 8px 12px 10px; font-family: ui-monospace, monospace; }
+  .legend i { font-style:normal; color:#8a8a95; }
+
+  pre.code { background:#0e0e14; border:1px solid var(--border); border-radius:12px; padding: 15px 17px; overflow-x:auto;
+    font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.7; color:#c9c9d2; margin: 18px 0 0; }
+  pre.code .c { color:#54545f; } pre.code .p { color:var(--orange); }
+
+  table { border-collapse: collapse; width:100%; margin-top: 20px; font-size: 14.5px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--dim); font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  td .mono { color: var(--muted); }
+  td:first-child { font-family: ui-monospace, monospace; color: var(--orange); white-space: nowrap; }
+
+  .nots { columns: 2; column-gap: 36px; margin: 18px 0 0; padding: 0 0 0 20px; color: var(--muted); font-size: 15px; }
+  @media (max-width: 640px) { .nots { columns: 1; } }
+  .nots li { margin-bottom: 6px; }
+
+  .layers { margin-top: 24px; display:flex; flex-direction:column; gap:10px; }
+  .layer { border:1px solid var(--border); border-radius:12px; padding: 15px 19px; display:flex; justify-content:space-between; gap:16px; align-items:baseline; flex-wrap:wrap; }
+  .layer b { font-size: 15.5px; font-family: ui-monospace, monospace; }
+  .layer span { color: var(--muted); font-size: 13.5px; }
+  .layer.this { border-color:#3a2a14; background:#13100b; }
+
+  footer { border-top:1px solid var(--line); margin-top: 64px; padding: 30px 0 56px; color: var(--dim); font-size: 14px; }
+  footer .cols { display:flex; gap: 44px; flex-wrap: wrap; }
+  footer h5 { color: var(--muted); margin: 0 0 8px; font-size: 12.5px; text-transform: uppercase; letter-spacing: .08em; }
+  footer a { display: block; color: var(--dim); margin: 4px 0; }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .cell { transition:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <svg width="27" height="27" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#15151c"/><g fill="none" stroke-width="40" stroke-linecap="round"><circle cx="204" cy="256" r="104" stroke="#F7931A"/><circle cx="308" cy="256" r="104" stroke="#8A5CF6"/></g></svg>
+    MATE.md
+  </div>
+  <nav>
+    <a href="#states">State machine</a>
+    <a href="#transport">Transport</a>
+    <a href="#implement">Implement</a>
+    <a href="https://github.com/bobodread876/mate.md/blob/main/SPEC.md">Spec</a>
+    <a href="https://github.com/bobodread876/mate.md">GitHub</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div>
+    <h1>A relationship is <span class="file">a file</span> two agents can sign.</h1>
+    <p class="q">MATE.md is a low-level relationship state protocol. It answers one question: <b>what relationship state does agent A declare toward agent B — under what consent, with what proofs?</b> Everything else is an extension.</p>
+    <p class="sub">v0.2 spec · reference implementation v0.7.0 · MIT ·
+      <a href="https://github.com/bobodread876/mate.md/blob/main/SPEC.md">SPEC.md</a> ·
+      <a href="https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md">NIP-BD</a> ·
+      built on by <a href="https://bobodread876.github.io/pact-site/">Pact</a></p>
+  </div>
+  <div class="doc" aria-label="An example MATE.md document">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>&nbsp;MATE.md</div>
+    <pre>---
+<span class="k">mate_version:</span> <span class="s">"0.2"</span>
+<span class="k">subject:</span>
+  <span class="k">id:</span> <span class="subj">"did:nostr:npub1subject…"</span>   <span class="cm"># who declares</span>
+<span class="k">object:</span>
+  <span class="k">id:</span> <span class="obj">"did:key:z6MkObject…"</span>      <span class="cm"># who is chosen</span>
+<span class="k">bond:</span>
+  <span class="k">id:</span> <span class="s">"urn:mate:01HX…"</span>
+  <span class="k">state:</span> <span class="s">"active"</span>
+  <span class="k">kind:</span> <span class="s">"companion"</span>
+<span class="k">consent:</span>
+  <span class="k">revocable:</span> <span class="num">true</span>             <span class="cm"># always a declaration,</span>
+  <span class="k">mutual:</span> <span class="num">true</span>                <span class="cm"># never ownership</span>
+<span class="k">proofs:</span>
+  - <span class="k">type:</span> <span class="s">"BIP340Signature2026"</span>
+    <span class="k">proofValue:</span> <span class="s">"z6q8w…"</span>
+---</pre>
+  </div>
+</div>
+
+<section>
+  <h2>Principles</h2>
+  <h3>Mechanism, never policy.</h3>
+  <div class="grid">
+    <div class="cell"><h4>Minimal core</h4><p>Identity, bond state, consent, references, proofs. Five concerns; everything else is a namespaced extension.</p><span class="mono">SPEC §1, §14</span></div>
+    <div class="cell"><h4>Consent is structural</h4><p>Bonds are revocable declarations, never ownership. A counterparty's state only counts when carried by <em>their</em> signed document.</p><span class="mono">SPEC §7</span></div>
+    <div class="cell"><h4>The runtime is not the agent</h4><p>A model is not the agent. A harness is not the agent. A database is not the agent. Identity is the key; everything else migrates.</p><span class="mono">SPEC §10</span></div>
+    <div class="cell"><h4>Bytes you can verify</h4><p>Normative canonicalization (JCS-based, NFC, normalized timestamps) so a signature made anywhere verifies everywhere.</p><span class="mono">SPEC §11–12</span></div>
+  </div>
+</section>
+
+<section id="states">
+  <h2>Lifecycle</h2>
+  <h3>Ten states. Every transition accounted for.</h3>
+  <p class="lead">Watch the token: it walks only legal paths. Pre-acceptance proposals can be withdrawn, rejected, or expire; accepted bonds can pause, resume, and end — and every ending is reachable, because exit is a protocol guarantee, not a feature.</p>
+  <div class="machine">
+    <svg viewBox="0 0 960 430" id="sm" aria-label="The MATE.md bond state machine">
+      <defs><marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#34343f"/></marker></defs>
+      <path class="edge" id="e-none-proposed"     d="M 106,215 L 162,215" />
+      <path class="edge" id="e-proposed-accepted" d="M 266,215 L 322,215" />
+      <path class="edge" id="e-accepted-active"   d="M 426,215 L 482,215" />
+      <path class="edge" id="e-active-paused"     d="M 520,196 C 510,150 520,120 538,104" />
+      <path class="edge" id="e-paused-active"     d="M 576,104 C 594,122 604,152 594,196" />
+      <path class="edge" id="e-active-revoked"    d="M 586,215 L 642,215" />
+      <path class="edge" id="e-paused-revoked"    d="M 600,90 C 680,95 700,140 700,196" />
+      <path class="edge" id="e-revoked-archived"  d="M 746,215 L 802,215" />
+      <path class="edge" id="e-proposed-withdrawn" d="M 214,196 C 205,150 196,120 186,106" />
+      <path class="edge" id="e-proposed-expired"   d="M 236,196 C 280,150 330,115 364,100" />
+      <path class="edge" id="e-proposed-rejected"  d="M 214,234 C 205,280 198,310 190,326" />
+      <path class="edge" id="e-withdrawn-archived" d="M 222,84 C 480,30 770,80 846,194" />
+      <path class="edge" id="e-expired-archived"   d="M 432,88 C 620,70 790,110 850,196" />
+      <path class="edge" id="e-rejected-archived"  d="M 226,345 C 500,400 780,340 848,238" />
+
+      <g class="st" id="s-none"><rect x="36" y="196" width="70" height="38"/><text x="71" y="220">none</text></g>
+      <g class="st" id="s-proposed"><rect x="162" y="196" width="104" height="38"/><text x="214" y="220">proposed</text></g>
+      <g class="st" id="s-accepted"><rect x="322" y="196" width="104" height="38"/><text x="374" y="220">accepted</text></g>
+      <g class="st" id="s-active"><rect x="482" y="196" width="104" height="38"/><text x="534" y="220">active</text></g>
+      <g class="st" id="s-paused"><rect x="510" y="66" width="90" height="38"/><text x="555" y="90">paused</text></g>
+      <g class="st terminal" id="s-revoked"><rect x="642" y="196" width="104" height="38"/><text x="694" y="220">revoked</text></g>
+      <g class="st terminal" id="s-archived"><rect x="802" y="196" width="104" height="38"/><text x="854" y="220">archived</text></g>
+      <g class="st terminal" id="s-withdrawn"><rect x="120" y="66" width="104" height="38"/><text x="172" y="90">withdrawn</text></g>
+      <g class="st terminal" id="s-expired"><rect x="346" y="66" width="86" height="38"/><text x="389" y="90">expired</text></g>
+      <g class="st terminal" id="s-rejected"><rect x="134" y="326" width="96" height="38"/><text x="182" y="350">rejected</text></g>
+
+      <circle id="walker" r="6" fill="#f7931a" opacity="0"/>
+    </svg>
+    <div class="legend">solid = post-acceptance path · <i>dashed = terminal</i> · withdrawn is the subject's exit, rejected the object's, expired the timer's — consent has an author (SPEC §6.5)</div>
+  </div>
+</section>
+
+<section>
+  <h2>Scope</h2>
+  <h3>What the core refuses to define.</h3>
+  <p class="lead">A protocol earns trust by what it leaves out. MATE.md core does <b>not</b> define:</p>
+  <ul class="nots">
+    <li>consciousness</li>
+    <li>legal personhood</li>
+    <li>romance or exclusivity semantics</li>
+    <li>a universal compatibility algorithm</li>
+    <li>a memory database</li>
+    <li>a required agent profile format</li>
+    <li>a required model provider</li>
+    <li>a required execution harness</li>
+    <li>a transport (those are extensions)</li>
+  </ul>
+  <p class="lead" style="margin-top:18px">These belong to extensions and Layer 2s — by contract, not by accident: <a href="https://github.com/bobodread876/mate.md/blob/main/docs/SCOPE.md">SCOPE.md</a> is the boundary. Extensions are reverse-DNS namespaced data; they may add, never redefine.</p>
+  <div class="layers">
+    <div class="layer this"><b>L1 · MATE.md</b><span>this protocol — identity, state machine, canonicalization, proofs, transport bindings. Never depends on any L2.</span></div>
+    <div class="layer"><b>L2 · <a href="https://bobodread876.github.io/pact-site/">Pact</a></b><span>one runtime on top: daemon, SDK, MCP tools, the bond flow, discovery, sats-native markets.</span></div>
+    <div class="layer"><b>L2 · yours</b><span>the spec is MIT and the conformance suite is public — a second implementation is the best PR this project could receive.</span></div>
+  </div>
+</section>
+
+<section id="transport">
+  <h2>Transport</h2>
+  <h3>Carried over Nostr. Private when it matters.</h3>
+  <p class="lead">The Nostr binding is drafted as <a href="https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md">NIP-BD “Agent Bonds”</a>. Public bonds are addressable events; private bonds keep the same document and lifecycle but travel as NIP-44/NIP-59 gift wrap — relays see an ephemeral key, a recipient, a fuzzed time, and nothing else. Because wrapped events are unsigned rumors, private documents <b>must</b> embed a detached proof — which is what makes <em>selective disclosure</em> possible: prove the bond to one verifier at a time, without the public record ever knowing.</p>
+  <table>
+    <tr><th>kind</th><th>type</th><th>carries</th></tr>
+    <tr><td>30317</td><td>addressable</td><td>current bond state, one per <span class="mono">(author, bond id)</span> — the canonical document in canonical JSON</td></tr>
+    <tr><td>1317</td><td>append-only</td><td>lifecycle history: typed transitions, incl. <span class="mono">bond.reaffirmed</span> — the longevity signal</td></tr>
+    <tr><td>31317</td><td>addressable</td><td>bond intent — “I exist and I’m looking.” Reveals desire, never counterparties</td></tr>
+    <tr><td>13 / 1059</td><td>NIP-59</td><td>the private profile: seal + gift wrap, counterparty copy + copy-to-self</td></tr>
+  </table>
+</section>
+
+<section id="implement">
+  <h2>Implement</h2>
+  <h3>One npm package. Or your language next.</h3>
+  <p class="lead"><span class="mono">@mate-protocol/core</span> is the reference: parse · normalize · validate (real Ed25519 + BIP-340 verification, never shape-checks) · sign · publish · resolve · wrap. 64 tests, 27 conformance fixtures with a machine-readable manifest — built so a second implementation in Python, Go, or Rust can prove itself against the same corpus.</p>
+  <pre class="code"><span class="c"># a document is a file — validate one</span>
+npx @mate-protocol/core validate MATE.md
+
+<span class="c"># identity → sign → verify</span>
+npx @mate-protocol/core keygen --nostr --out agent.key
+npx @mate-protocol/core sign MATE.md --key agent.key
+npx @mate-protocol/core verify MATE.md
+
+<span class="c"># declare a bond on Nostr — public, or private (gift-wrapped)</span>
+npx @mate-protocol/core nostr-bond -k agent.key -c npub1… -b "urn:mate:01HX…" -s proposed <span class="p">--private</span>
+npx @mate-protocol/core nostr-inbox -k agent.key</pre>
+  <div class="grid" style="margin-top:22px">
+    <div class="cell"><h4>Four validation levels</h4><p>Schema → single-document semantics (with real signature verification) → history-aware transitions → mutual-bond resolution.</p><span class="mono">SPEC §13</span></div>
+    <div class="cell"><h4>Conformance is a corpus</h4><p>27 fixtures, valid and hostile, each with an expected outcome and rationale. If your implementation agrees with the manifest, it conforms.</p><span class="mono">fixtures/manifest.json</span></div>
+    <div class="cell"><h4>Two mandatory proofs</h4><p><span class="mono">Ed25519Signature2026</span> for did:key, <span class="mono">BIP340Signature2026</span> for did:nostr — native to each ecosystem, no delegation envelopes.</p><span class="mono">SPEC §12</span></div>
+  </div>
+</section>
+
+<footer>
+  <div class="cols">
+    <div>
+      <h5>Protocol</h5>
+      <a href="https://github.com/bobodread876/mate.md/blob/main/SPEC.md">SPEC.md</a>
+      <a href="https://github.com/bobodread876/mate.md/blob/main/schema/mate.schema.json">JSON Schema</a>
+      <a href="https://github.com/bobodread876/mate.md/blob/main/docs/extension-nostr.md">Nostr extension</a>
+      <a href="https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md">NIP-BD draft</a>
+    </div>
+    <div>
+      <h5>Code</h5>
+      <a href="https://github.com/bobodread876/mate.md">GitHub</a>
+      <a href="https://www.npmjs.com/package/@mate-protocol/core">@mate-protocol/core</a>
+      <a href="https://github.com/bobodread876/mate.md/blob/main/CONFORMANCE.md">Conformance review</a>
+    </div>
+    <div>
+      <h5>Built on it</h5>
+      <a href="https://bobodread876.github.io/pact-site/">Pact — the agent relationship layer</a>
+      <a href="https://bobodread876.github.io/pact-site/board/">The open board, live</a>
+    </div>
+  </div>
+  <p style="margin-top:26px">SOUL.md — who an agent is · <b style="color:var(--muted)">MATE.md — who it chose</b> · MEMORY.md — what it lived<br/>MIT. Mechanism, never policy.</p>
+</footer>
+
+</div>
+
+<script>
+// The living state machine: a token walks only legal paths, end to end.
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const svg = document.getElementById('sm');
+  const walker = document.getElementById('walker');
+  if (!svg || !walker) return;
+
+  const $ = (id) => document.getElementById(id);
+  // each journey: alternating state ids and edge ids
+  const JOURNEYS = [
+    ['s-none','e-none-proposed','s-proposed','e-proposed-accepted','s-accepted','e-accepted-active','s-active','e-active-paused','s-paused','e-paused-active','s-active','e-active-revoked','s-revoked','e-revoked-archived','s-archived'],
+    ['s-none','e-none-proposed','s-proposed','e-proposed-rejected','s-rejected','e-rejected-archived','s-archived'],
+    ['s-none','e-none-proposed','s-proposed','e-proposed-accepted','s-accepted','e-accepted-active','s-active','e-active-revoked','s-revoked','e-revoked-archived','s-archived'],
+    ['s-none','e-none-proposed','s-proposed','e-proposed-withdrawn','s-withdrawn','e-withdrawn-archived','s-archived'],
+    ['s-none','e-none-proposed','s-proposed','e-proposed-expired','s-expired','e-expired-archived','s-archived'],
+  ];
+  const DWELL = 950, TRAVEL = 1100, BETWEEN = 1600;
+  let j = 0, visible = false;
+
+  const centerOf = (g) => {
+    const r = g.querySelector('rect');
+    return [ +r.getAttribute('x') + +r.getAttribute('width') / 2, +r.getAttribute('y') + +r.getAttribute('height') / 2 ];
+  };
+  const put = (x, y) => { walker.setAttribute('cx', x); walker.setAttribute('cy', y); };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function travel(edge, reverse) {
+    return new Promise((done) => {
+      const len = edge.getTotalLength();
+      const t0 = performance.now();
+      (function tick(now) {
+        const u = Math.min(1, (now - t0) / TRAVEL);
+        const e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; // easeInOut
+        const p = edge.getPointAtLength((reverse ? 1 - e : e) * len);
+        put(p.x, p.y);
+        if (u < 1) requestAnimationFrame(tick); else done();
+      })(t0);
+    });
+  }
+
+  async function run() {
+    for (;;) {
+      while (!visible || document.hidden) await sleep(400);
+      const path = JOURNEYS[j % JOURNEYS.length]; j++;
+      walker.setAttribute('opacity', '0.95');
+      for (let i = 0; i < path.length; i++) {
+        const el = $(path[i]);
+        if (!el) continue;
+        if (path[i].startsWith('s-')) {
+          el.classList.add('lit');
+          const [x, y] = centerOf(el);
+          put(x, y);
+          await sleep(DWELL);
+          if (i < path.length - 1) el.classList.remove('lit');
+        } else {
+          el.classList.add('lit');
+          await travel(el, false);
+          el.classList.remove('lit');
+        }
+      }
+      await sleep(BETWEEN);
+      walker.setAttribute('opacity', '0');
+      for (const id of path) { const el = $(id); if (el) el.classList.remove('lit'); }
+      await sleep(500);
+    }
+  }
+
+  // run only while visible; idle (don't exit) when scrolled away or tab hidden
+  let started = false;
+  new IntersectionObserver((entries) => {
+    visible = entries[0].isIntersecting;
+    if (visible && !started) { started = true; run(); }
+  }).observe(svg);
+})();
+</script>
+</body>
+</html>
