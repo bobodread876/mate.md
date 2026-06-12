@@ -133,6 +133,8 @@ mate.md/
 
 [![npm](https://img.shields.io/npm/v/@mate-protocol/core)](https://www.npmjs.com/package/@mate-protocol/core)
 
+**Protocol page:** https://bobodread876.github.io/mate.md/ — the spec, state machine, and transport at a glance.
+
 **v0.2.0 spec is released; the reference implementation is at v0.5.0.** All three phases complete:
 
 1. **Spec (Phase 1)** — 649-line normative SPEC.md with 10-state machine, canonicalization, dual proof profiles
