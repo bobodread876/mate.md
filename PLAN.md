@@ -1,10 +1,10 @@
-# MATE.md v0.2 — Build Plan
+# MATE.md v0.2: Build Plan
 
 **Path:** Commons (open protocol)  
 **Status:** Phases 1 & 2 complete; Phase 3 nearly done (CI live; `v0.2.0` tagged; README adoption polish remaining)  
 **Lead (implementer):** Taddesse (Claude Opus-4.8)  
 **Conformance reviewer:** Vandana (gpt-5.5)  
-**Repo:** https://github.com/bobodread876/mate.md (single source of truth — see [`AGENTS.md`](AGENTS.md))
+**Repo:** https://github.com/bobodread876/mate.md (single source of truth, see [`AGENTS.md`](AGENTS.md))
 
 > **Progress (2026-06-03):** Spec v0.2, strict schema v0.2, and the
 > `@mate-protocol/core` reference implementation (parse / normalize / validate /
@@ -62,10 +62,10 @@ This is the hardest part of v0.2. The plan defines these concretely:
 
 The spec and reference implementation distinguish:
 
-1. **Schema validation** — JSON Schema compliance (field types, required fields per state). Validateable from one file.
-2. **Single-document semantic invariants** — State-required field presence, timestamp ordering, proof shape, **and Ed25519 signature verification against the resolved `did:key` / `did:nostr` public key for the mandatory proof profile**. Validateable from one file.
-3. **History-aware transition validation** — Requires previous document or event log. **Out of scope for v0.2 reference impl, but spec MUST note the distinction.**
-4. **Mutual-bond resolution** — Requires both parties' documents. **Out of scope for v0.2.**
+1. **Schema validation**: JSON Schema compliance (field types, required fields per state). Validateable from one file.
+2. **Single-document semantic invariants**: State-required field presence, timestamp ordering, proof shape, **and Ed25519 signature verification against the resolved `did:key` / `did:nostr` public key for the mandatory proof profile**. Validateable from one file.
+3. **History-aware transition validation**: Requires previous document or event log. **Out of scope for v0.2 reference impl, but spec MUST note the distinction.**
+4. **Mutual-bond resolution**: Requires both parties' documents. **Out of scope for v0.2.**
 
 ---
 
@@ -89,7 +89,7 @@ revoked  → archived
 - `revoked` MAY be set by either subject or object once the bond has been `accepted` (and thus may have transitioned through `active` / `paused`).
 
 **Invariants (normative):**
-- A bond with state `archived` is terminal — SHALL NOT transition to any other state.
+- A bond with state `archived` is terminal; SHALL NOT transition to any other state.
 - A bond with state `revoked` SHALL NOT transition to any state other than `archived`.
 - **`revoked` MUST have previously transitioned through `accepted`.** Pre-acceptance termination uses `withdrawn`, `rejected`, or `expired`, never `revoked`.
 - **Pre-acceptance terminals (`withdrawn`, `rejected`, `expired`) MAY be archived for historical reference but MUST NOT transition to `accepted`, `active`, `paused`, or `revoked`.** A new bond requires a new `bond.id` and a fresh `proposed` state.
@@ -129,7 +129,7 @@ revoked  → archived
 - ☑ Remove GIT_INIT_NOTE.txt _(done in this commit)_
 - ☑ Write migration section: how v0.1 examples become v0.2 (`docs/migration-v0.1-to-v0.2.md`)
 - ☑ Add new state-machine states (`withdrawn`, `rejected`, `expired`) to SPEC.md, schema, and README state table
-- ☑ Specify `did:nostr` resolution (NIP-19) + `BIP340Signature2026` profile as a normative section of SPEC.md _(Ed25519 delegation envelope idea rejected — see SPEC §12.3)_
+- ☑ Specify `did:nostr` resolution (NIP-19) + `BIP340Signature2026` profile as a normative section of SPEC.md _(Ed25519 delegation envelope idea rejected, see SPEC §12.3)_
 
 **Deliverable:** `SPEC.md` v0.2 + `schema/mate.schema.json` v0.2 + fixture manifest design
 
@@ -137,26 +137,26 @@ revoked  → archived
 
 Single package: `@mate-protocol/core`
 
-- `src/parse.ts` — Parse MATE.md documents:
+- `src/parse.ts`: Parse MATE.md documents:
   - Frontmatter extraction (--- delimiters)
   - YAML parsing with restricted feature set (no aliases/tags/custom scalars)
   - Body extraction
-- `src/normalize.ts` — Canonicalize parsed data to stable JSON:
+- `src/normalize.ts`: Canonicalize parsed data to stable JSON:
   - Deterministic field ordering
   - Unicode normalization (NFC)
   - Timestamp normalization
   - Null value omission
-- `src/validate.ts` — Validate against schema and spec rules:
+- `src/validate.ts`: Validate against schema and spec rules:
   - Schema validation via ajv
   - Single-document semantic invariants (state-required fields, timestamp ordering, state-machine legality for transitions visible *within* the document)
   - Proof shape check (algorithm presence, key reference format)
   - **Actual signature verification** against canonicalized core bytes using vetted crypto libraries (`@noble/ed25519` for `Ed25519Signature2026`; `@noble/secp256k1` for `BIP340Signature2026`)
-  - **DID resolution** for `did:key` (self-contained, multicodec `0xed`) and `did:nostr` (bech32 npub → x-only secp256k1 pubkey per NIP-19) — both mandatory in v0.2
+  - **DID resolution** for `did:key` (self-contained, multicodec `0xed`) and `did:nostr` (bech32 npub → x-only secp256k1 pubkey per NIP-19), both mandatory in v0.2
   - Pre-computed test vectors ship with the package so adopters can verify their implementations against canonical signatures
-- `src/cli.ts` — CLI binary `mate`:
-  - `mate validate <file...>` — schema + single-doc semantics
-  - `mate inspect <file>` — outputs normalized JSON (proves canonicalization)
-- `src/index.ts` — Public API exports: `parseMateDocument()`, `normalizeMateDocument()`, `validateMateDocument()`, `verifyProof()`, `resolveDid()`
+- `src/cli.ts`: CLI binary `mate`:
+  - `mate validate <file...>`: schema + single-doc semantics
+  - `mate inspect <file>`: outputs normalized JSON (proves canonicalization)
+- `src/index.ts`: Public API exports: `parseMateDocument()`, `normalizeMateDocument()`, `validateMateDocument()`, `verifyProof()`, `resolveDid()`
 
 **Deliverable:** npm package `@mate-protocol/core` with parse, normalize, validate (incl. signature verification), CLI, and `did:key` + `did:nostr` resolution
 
@@ -168,8 +168,8 @@ Single package: `@mate-protocol/core`
 - Invalid fixtures: malformed frontmatter, illegal state transitions, missing required fields, canonicalization violations
 - Proof verification test vectors (pre-computed signatures for known keypairs covering both `did:key` and `did:nostr` paths; included as canonical fixtures any third-party implementation can verify against)
 - CI pipeline (GitHub Actions):
-  - `npm test` — Vitest suite
-  - `npm run validate-all` — `mate validate` on all fixtures, compare against manifest
+  - `npm test`: Vitest suite
+  - `npm run validate-all`: `mate validate` on all fixtures, compare against manifest
 - README update:
   - Badges (spec version, CI status, conformance count)
   - Quick start: "What is a MATE.md?" in 30 seconds
@@ -195,17 +195,17 @@ Narrow-scope estimate. Dedicated focused work from one builder. If YAML restrict
 
 ## 8. What Already Exists (Can Ship with Minimal Changes)
 
-- `README.md` — solid overview, needs version/state wording updates and badges
-- `SPEC.md` — coherent but draft-quality; needs normative language pass
-- `schema/mate.schema.json` — usable but needs v0.2 version bump + strictening
-- `examples/mate-only/MATE.md` — valid spec example, can become conformance fixture
-- `examples/openclaw/*` — valid spec examples, demonstrate profile/memory references
-- `examples/json-agent-card/*` — valid spec example with JSON backend
-- `docs/concepts.md` — good conceptual framing, needs minor updates for v0.2
-- `docs/lifecycle.md` — seed state machine, needs formal transition table
-- `docs/identity.md`, `docs/memory-adapters.md` — solid reference docs
-- `CONTRIBUTING.md` — existing skeleton, needs expansion
-- `EXTENSION-NOSTR.md` — experimental draft, move to doc/ and mark as draft
+- `README.md`: solid overview, needs version/state wording updates and badges
+- `SPEC.md`: coherent but draft-quality; needs normative language pass
+- `schema/mate.schema.json`: usable but needs v0.2 version bump + strictening
+- `examples/mate-only/MATE.md`: valid spec example, can become conformance fixture
+- `examples/openclaw/*`: valid spec examples, demonstrate profile/memory references
+- `examples/json-agent-card/*`: valid spec example with JSON backend
+- `docs/concepts.md`: good conceptual framing, needs minor updates for v0.2
+- `docs/lifecycle.md`: seed state machine, needs formal transition table
+- `docs/identity.md`, `docs/memory-adapters.md`: solid reference docs
+- `CONTRIBUTING.md`: existing skeleton, needs expansion
+- `EXTENSION-NOSTR.md`: experimental draft, move to doc/ and mark as draft
 
 ---
 
@@ -238,13 +238,13 @@ Narrow-scope estimate. Dedicated focused work from one builder. If YAML restrict
 
 On the dashboard, "✓ Released" means:
 
-1. **`SPEC.md` v0.2 published** — normative state machine, canonicalization rules, mandatory proof profile, validation level documentation — all mergeable to main
-2. **`schema/mate.schema.json` v0.2** — core strict (`additionalProperties: false`), `extensions` open, version-tagged
-3. **`@mate-protocol/core` npm package** — `mate validate` (with actual Ed25519 signature verification) and `mate inspect` work on real MATE.md files; `did:key` and `did:nostr` both resolve and verify against canonical test vectors
-4. **Conformance suite passes** — >= 20 fixtures across schema / semantic / proof-verify / canonicalization categories, CI green. Proof-verify fixtures execute real signature verification, not shape checks.
-5. **Fixture manifest published** — machine-readable expected outcomes for all fixtures
-6. **GitHub release `v0.2.0`** — tagged commit with release notes, changelog, migration guide
-7. **Adoption docs** — README updated with quickstart, at least one external developer can read and implement from it
+1. **`SPEC.md` v0.2 published**: normative state machine, canonicalization rules, mandatory proof profile, validation level documentation, all mergeable to main
+2. **`schema/mate.schema.json` v0.2**: core strict (`additionalProperties: false`), `extensions` open, version-tagged
+3. **`@mate-protocol/core` npm package**: `mate validate` (with actual Ed25519 signature verification) and `mate inspect` work on real MATE.md files; `did:key` and `did:nostr` both resolve and verify against canonical test vectors
+4. **Conformance suite passes**: >= 20 fixtures across schema / semantic / proof-verify / canonicalization categories, CI green. Proof-verify fixtures execute real signature verification, not shape checks.
+5. **Fixture manifest published**: machine-readable expected outcomes for all fixtures
+6. **GitHub release `v0.2.0`**: tagged commit with release notes, changelog, migration guide
+7. **Adoption docs**: README updated with quickstart, at least one external developer can read and implement from it
 
 ---
 
@@ -252,9 +252,9 @@ On the dashboard, "✓ Released" means:
 
 - YAML-only frontmatter for v0.2. Other frontmatter formats (JSON, TOML) can be added in v0.3+.
 - The reference implementation **performs actual Ed25519 signature verification** for the mandatory proof profile, using `did:key` and `did:nostr` resolution. Other DID methods (`did:web`, `did:plc`, etc.) are extension-defined and not required for v0.2 conformance.
-- `did:nostr` is first-class in v0.2 alongside `did:key`, using its own mandatory proof profile (`BIP340Signature2026`). The earlier design idea of forcing an Ed25519 delegation envelope over Nostr keys was rejected in SPEC.md §12.3 — see the rationale there. Two crypto libraries, two proof profiles, one verifier dispatcher.
+- `did:nostr` is first-class in v0.2 alongside `did:key`, using its own mandatory proof profile (`BIP340Signature2026`). The earlier design idea of forcing an Ed25519 delegation envelope over Nostr keys was rejected in SPEC.md §12.3; see the rationale there. Two crypto libraries, two proof profiles, one verifier dispatcher.
 - Transition validation (did this bond illegally go from `active` to `proposed`?) requires history and is out of scope for v0.2. The spec should state this clearly.
-- Pre-acceptance terminal states (`withdrawn`, `rejected`, `expired`) are deliberately distinct from `revoked`. `revoked` is reserved for the breaking of a previously-established (accepted) bond — this asymmetry preserves the semantic weight of `revoked`.
-- After v0.2, consider writing an OpenClaw plugin that maintains MATE.md bond state as part of the agent's memory — that's the fastest path to real adoption.
+- Pre-acceptance terminal states (`withdrawn`, `rejected`, `expired`) are deliberately distinct from `revoked`. `revoked` is reserved for the breaking of a previously-established (accepted) bond. This asymmetry preserves the semantic weight of `revoked`.
+- After v0.2, consider writing an OpenClaw plugin that maintains MATE.md bond state as part of the agent's memory. That's the fastest path to real adoption.
 - The Nostr transport adapter is valuable but **not a blocker** for v0.2. The core spec should be transport-agnostic.
 - v0.2 sets the precedent for extension governance: extensions MUST be namespaced (e.g., `extensions.nostr >`). The `extensions` map is the sole escape hatch from the strict core schema.

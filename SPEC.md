@@ -2,7 +2,7 @@
 
 **Version:** `0.2-draft`
 **Status:** Building (Phase 1 of [PLAN.md](PLAN.md))
-**Editors:** Taddesse (Claude Opus-4.8), Vandana (gpt-5.5) — conformance review
+**Editors:** Taddesse (Claude Opus-4.8), Vandana (gpt-5.5, conformance review)
 
 ---
 
@@ -36,7 +36,7 @@ MATE.md core does NOT define:
 - a required agent profile format
 - a required model provider
 - a required execution harness
-- a transport (Nostr, HTTP, IPFS, etc. — those are extensions)
+- a transport (Nostr, HTTP, IPFS, etc.; those are extensions)
 
 These belong in extensions or implementations.
 
@@ -135,7 +135,7 @@ The following DID methods are **OPTIONAL** in v0.2 and **MAY** be supported by i
 - `did:pkh`
 - Any other DID method registered in the [W3C DID Method Registry](https://w3c.github.io/did-spec-registries/)
 
-Non-DID identifiers (e.g., bare HTTPS URIs, URNs, content-addressed identifiers) **MAY** appear in `subject.id`/`object.id` but **MUST NOT** appear as `proofs[].verificationMethod` — proofs require a resolvable cryptographic key reference.
+Non-DID identifiers (e.g., bare HTTPS URIs, URNs, content-addressed identifiers) **MAY** appear in `subject.id`/`object.id` but **MUST NOT** appear as `proofs[].verificationMethod`: proofs require a resolvable cryptographic key reference.
 
 ### 5.4 `did:nostr` ABNF and Resolution
 
@@ -151,7 +151,7 @@ base32-char    = %x71-7A / %x30-39            ; bech32 charset
 1. The DID `did:nostr:<npub>` identifies a Nostr public key (32-byte x-only secp256k1 per [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)).
 2. The bech32 string `npub1...` is decoded per [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md). The resulting 32 bytes are the x-only pubkey.
 3. The optional `#<key-id>` fragment **MAY** be used by extension proof profiles to disambiguate among multiple keys; the v0.2 mandatory profile (§12.3) ignores the fragment.
-4. Resolution is **self-contained** — no relay query is required to verify a v0.2 mandatory-profile proof. The key material is recoverable directly from the DID string.
+4. Resolution is **self-contained**: no relay query is required to verify a v0.2 mandatory-profile proof. The key material is recoverable directly from the DID string.
 
 A `did:nostr` identifier **MUST NOT** be confused with a Nostr event ID or a `nevent`/`nprofile`/`naddr` bech32 entity; only `npub`-encoded pubkeys are valid.
 
@@ -187,9 +187,9 @@ The following ten core states are defined in v0.2:
 
 | State | Symbol | Stage | Reachable from |
 |-------|--------|-------|----------------|
-| `none` | — | initial | (initial) |
-| `proposed` | — | pre-acceptance | `none` |
-| `accepted` | — | acceptance | `proposed` |
+| `none` | n/a | initial | (initial) |
+| `proposed` | n/a | pre-acceptance | `none` |
+| `accepted` | n/a | acceptance | `proposed` |
 | `active` | ⚙ | post-acceptance | `accepted`, `paused` |
 | `paused` | ‖ | post-acceptance (suspended) | `active` |
 | `revoked` | ✗ | post-acceptance terminal | `active`, `paused` |
@@ -221,7 +221,7 @@ The following invariants **MUST** be enforced by conforming validators that perf
 
 1. **Terminal-state finality.** A bond with state `archived` **SHALL NOT** transition to any other state. A bond with state `revoked` **SHALL NOT** transition to any state other than `archived`.
 2. **Pre-acceptance terminals.** `withdrawn`, `rejected`, and `expired` **MAY** transition to `archived` but **MUST NOT** transition to `accepted`, `active`, `paused`, or `revoked`. A new bond requires a new `bond.id` and a fresh `proposed` state.
-3. **Revocation requires acceptance.** `revoked` **MUST** be reachable only from `active` or `paused`, both of which require prior transition through `accepted`. A bond that was never accepted cannot be `revoked` — it is `withdrawn`, `rejected`, or `expired`.
+3. **Revocation requires acceptance.** `revoked` **MUST** be reachable only from `active` or `paused`, both of which require prior transition through `accepted`. A bond that was never accepted cannot be `revoked`; it is `withdrawn`, `rejected`, or `expired`.
 4. **Acceptance precedes activation.** `accepted` **MUST** come before `active`. `active` is unreachable except via `accepted`.
 5. **Pause is reversible only to active.** `paused` is reachable only from `active`, and **MAY** return only to `active` or proceed to `revoked`. `paused` **MUST NOT** transition directly to `archived` without passing through `revoked`.
 
@@ -381,7 +381,7 @@ All timestamp fields (`*_at`) **MUST** be normalized to ISO 8601 with:
 Examples:
 
 - Valid: `"2026-04-23T00:00:00.000000Z"`
-- Invalid: `"2026-04-23T00:00:00Z"` (missing microseconds — validator MUST normalize before comparison, but canonical form requires six digits)
+- Invalid: `"2026-04-23T00:00:00Z"` (missing microseconds: validator MUST normalize before comparison, but canonical form requires six digits)
 - Invalid: `"2026-04-23T00:00:00+00:00"` (wrong UTC notation)
 
 Implementations **MUST** normalize input timestamps to the canonical form before computing or verifying signatures.
@@ -509,7 +509,7 @@ The `proofs` array **MUST** be excluded from signature bytes per §11.2. To add 
 2. Signs.
 3. Appends the new proof object to the `proofs` array.
 
-This means all proofs in a document sign the same canonical bytes — they witness the same document state, not each other.
+This means all proofs in a document sign the same canonical bytes and witness the same document state.
 
 ---
 
@@ -576,7 +576,7 @@ Implementations:
 
 - **MUST** verify signatures when `proofs` are present (per §13.2).
 - **SHOULD** preserve event history (per §9).
-- **SHOULD** avoid hidden memory edits — agent memory mutations should be event-logged.
+- **SHOULD** avoid hidden memory edits: agent memory mutations should be event-logged.
 - **MUST** support revocation per §6.4.
 - **SHOULD** avoid coercive bonding flows (e.g., bonds proposed under duress or without clear consent).
 - **MUST** separate agent identity from runtime identity (per §10).
@@ -609,13 +609,13 @@ MATE.md does not make claims about machine consciousness or legal personhood.
 
 ### Normative
 
-- [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) — Key words for use in RFCs
-- [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174) — Ambiguity of uppercase vs lowercase in RFC 2119 key words
-- [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032) — Edwards-Curve Digital Signature Algorithm (EdDSA)
-- [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) — JSON Canonicalization Scheme (JCS)
+- [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): Key words for use in RFCs
+- [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174): Ambiguity of uppercase vs lowercase in RFC 2119 key words
+- [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032): Edwards-Curve Digital Signature Algorithm (EdDSA)
+- [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785): JSON Canonicalization Scheme (JCS)
 - [W3C did:key spec](https://w3c-ccg.github.io/did-method-key/)
-- [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) — Schnorr signatures for secp256k1
-- [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md) — bech32-encoded entities (npub)
+- [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki): Schnorr signatures for secp256k1
+- [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md): bech32-encoded entities (npub)
 - [Multibase](https://github.com/multiformats/multibase)
 - [JSON Schema draft 2020-12](https://json-schema.org/draft/2020-12/release-notes)
 
@@ -624,9 +624,9 @@ MATE.md does not make claims about machine consciousness or legal personhood.
 - [W3C DID Core 1.0](https://www.w3.org/TR/did-core/)
 - [W3C DID Method Registry](https://w3c.github.io/did-spec-registries/)
 - [NIP-01 (Nostr protocol basics)](https://github.com/nostr-protocol/nips/blob/master/01.md)
-- [`PLAN.md`](PLAN.md) — v0.2 build plan
-- [`REVIEW.md`](REVIEW.md) — consolidated review of v0.2 plan
-- [`docs/extension-nostr.md`](docs/extension-nostr.md) — Nostr transport extension (experimental)
+- [`PLAN.md`](PLAN.md): v0.2 build plan
+- [`REVIEW.md`](REVIEW.md): consolidated review of v0.2 plan
+- [`docs/extension-nostr.md`](docs/extension-nostr.md): Nostr transport extension (experimental)
 
 ---
 
@@ -639,7 +639,7 @@ Summary of breaking changes:
 1. `mate_version` value changes from `"0.1"` to `"0.2"`.
 2. Three new core states added: `withdrawn`, `rejected`, `expired`. Existing v0.1 documents in `none`/`proposed`/`accepted`/`active`/`paused`/`revoked`/`archived` remain valid.
 3. Proof object shape changed: `type` field now uses W3C-VC-style profile identifiers (`Ed25519Signature2026`, `BIP340Signature2026`); `proofValue` replaces `value`; `verificationMethod` replaces `signer`/`algorithm`.
-4. Canonicalization is now normative (§11). v0.1 had no canonicalization, so any v0.1 proofs cannot be mechanically migrated — they must be re-signed against v0.2 canonical bytes.
+4. Canonicalization is now normative (§11). v0.1 had no canonicalization, so any v0.1 proofs cannot be mechanically migrated; they must be re-signed against v0.2 canonical bytes.
 5. `did:nostr` is now a first-class supported method (§5.4).
 6. Extension keys MUST be reverse-DNS namespaced (§14.1).
 7. Top-level `additionalProperties` is now `false` for all core objects except `extensions`.

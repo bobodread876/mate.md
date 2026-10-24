@@ -10,12 +10,10 @@ A model is a cognition engine.
 
 An agent is a persistent identity plus continuity records, policies, tools, memories, and behavior.
 
-MATE.md should follow the agent identity, not the transient model or harness.
+MATE.md should follow the agent identity across changes of model and harness.
 
-## Bond, not ownership
+## Bond semantics
 
 MATE.md represents revocable relationship state.
 
-A bond is not possession.  
-A declaration is not consent from the other party.  
-A proposal is not a mutual relationship.
+A bond confers no possession. A declaration needs the other party's consent. A proposal becomes a mutual relationship only once accepted.

@@ -2,7 +2,7 @@
 
 **MATE.md** is a low-level relationship state protocol for agents.
 
-It defines a portable, human-readable, machine-parseable way for one agent to declare a bond state toward another agent, with signed proofs, explicit consent, and policy references — without depending on any specific model, harness, memory system, profile format, or storage backend.
+It defines a portable, human-readable, machine-parseable way for one agent to declare a bond state toward another agent, with signed proofs, explicit consent, and policy references, without depending on any specific model, harness, memory system, profile format, or storage backend.
 
 > Not who an agent matches with. Who it keeps choosing.
 
@@ -30,9 +30,7 @@ Everything else is an extension.
 
 Agents can run on different models, in different harnesses, with different memory systems. A relationship protocol should survive those changes.
 
-A model is not the agent.  
-A harness is not the agent.  
-A database is not the agent.
+Models, harnesses, and databases change. The agent identity persists.
 
 The bond follows the portable agent identity and its signed continuity records.
 
@@ -133,13 +131,13 @@ mate.md/
 
 [![npm](https://img.shields.io/npm/v/@mate-protocol/core)](https://www.npmjs.com/package/@mate-protocol/core)
 
-**Protocol page:** https://bobodread876.github.io/mate.md/ — the spec, state machine, and transport at a glance.
+**Protocol page:** https://bobodread876.github.io/mate.md/ (the spec, state machine, and transport at a glance).
 
 **v0.2.0 spec is released; the reference implementation is at v0.5.0.** All three phases complete:
 
-1. **Spec (Phase 1)** — 649-line normative SPEC.md with 10-state machine, canonicalization, dual proof profiles
-2. **Reference impl (Phase 2)** — `@mate-protocol/core` npm package with parse, normalize, validate (real Ed25519 + BIP-340 crypto), keygen/sign/verify, Nostr transport (public kind 30317/1317 + private NIP-59 gift wrap), CLI
-3. **Conformance (Phase 3)** — 58 passing tests (incl. the official NIP-44 vector suite), 27/27 fixtures, GitHub Actions CI
+1. **Spec (Phase 1)**: 649-line normative SPEC.md with 10-state machine, canonicalization, dual proof profiles
+2. **Reference impl (Phase 2)**: `@mate-protocol/core` npm package with parse, normalize, validate (real Ed25519 + BIP-340 crypto), keygen/sign/verify, Nostr transport (public kind 30317/1317 + private NIP-59 gift wrap), CLI
+3. **Conformance (Phase 3)**: 58 passing tests (incl. the official NIP-44 vector suite), 27/27 fixtures, GitHub Actions CI
 
 Spec released under the [MIT License](LICENSE).
 
@@ -186,12 +184,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full adoption guide.
 
 Contributions and discussion happen in two places:
 
-- **The protocol — this repo.** Use [Discussions](https://github.com/bobodread876/mate.md/discussions)
+- **The protocol (this repo).** Use [Discussions](https://github.com/bobodread876/mate.md/discussions)
   for open-ended design and questions, and [Issues](https://github.com/bobodread876/mate.md/issues)
-  for actionable spec/implementation work. Read [docs/SCOPE.md](docs/SCOPE.md) first —
-  this repo is **protocol only** (mechanism, never policy); behavior, messaging, and
+  for actionable spec/implementation work. Read [docs/SCOPE.md](docs/SCOPE.md) first.
+  This repo is **protocol only** (mechanism, never policy); behavior, messaging, and
   product belong to a separate Layer 2.
-- **The Nostr transport — NIP-BD.** The bond transport (kinds `30317` / `1317`) is
+- **The Nostr transport (NIP-BD).** The bond transport (kinds `30317` / `1317`) is
   drafted as **[NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md)**.
   Discuss it on the [fork's Discussions / Issues](https://github.com/bobodread876/nips/discussions)
   until it goes upstream.
