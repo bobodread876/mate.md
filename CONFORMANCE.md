@@ -3,7 +3,7 @@
 **Reviewer:** Patoo 🔥
 **Date:** 2026-06-03
 **Commit reviewed:** `e6a625e`
-**Tag:** `v0.2.0` — `@mate-protocol/core@0.2.0`
+**Tag:** `v0.2.0`, `@mate-protocol/core@0.2.0`
 
 ---
 
@@ -12,13 +12,13 @@
 Each normative **MUST** / **SHOULD** / **MAY** statement from `SPEC.md` was extracted and
 checked against:
 
-1. `schema/mate.schema.json` — JSON Schema
-2. `src/validate.ts` — semantic + crypto validation
-3. `src/normalize.ts` — canonicalization
-4. `src/did.ts` — DID resolution
-5. `src/parse.ts` — YAML frontmatter parsing
-6. `fixtures/manifest.json` + fixtures — test coverage
-7. `test/validate-fixtures.test.ts` — test harness
+1. `schema/mate.schema.json`: JSON Schema
+2. `src/validate.ts`: semantic + crypto validation
+3. `src/normalize.ts`: canonicalization
+4. `src/did.ts`: DID resolution
+5. `src/parse.ts`: YAML frontmatter parsing
+6. `fixtures/manifest.json` + fixtures: test coverage
+7. `test/validate-fixtures.test.ts`: test harness
 
 Each requirement was rated:
 
@@ -49,14 +49,14 @@ Each requirement was rated:
 | §15 Security | 1 | 1 | 0 | 0 |
 | **Total** | **52** | **44** | **8** | **0** |
 
-**Overall: PASS with gaps** — 44/52 (85%) fully conformant. All 8 warnings
-are test-coverage gaps, not spec/code contradictions. Zero failures.
+**Overall: PASS with gaps**: 44/52 (85%) fully conformant. All 8 warnings
+are test-coverage gaps. Zero failures.
 
 ---
 
 ## 2. Detailed Findings
 
-### §3 — Document Format (5/5 ✅)
+### §3: Document Format (5/5 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
@@ -66,13 +66,13 @@ are test-coverage gaps, not spec/code contradictions. Zero failures.
 | 3.3 | Frontmatter MUST be valid YAML 1.2 | MUST | ✅ | js-yaml JSON_SCHEMA |
 | 3.3 | No YAML aliases/anchors, tags, multi-doc streams | MUST | ✅ | rejectRestrictedYaml() in parse.ts |
 
-### §4 — Required Fields (1/1 ✅)
+### §4: Required Fields (1/1 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
 | 4 | `mate_version`, `subject.id`, `object.id`, `bond.id`, `bond.state`, `consent.revocable` | MUST | ✅ | Schema required[] array |
 
-### §5 — Identity (5/5 ✅)
+### §5: Identity (5/5 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
@@ -82,7 +82,7 @@ are test-coverage gaps, not spec/code contradictions. Zero failures.
 | 5.4 | Resolution is self-contained (no relay query) | MUST | ✅ | No network in resolveDid() |
 | 5.4 | Only `npub`-encoded pubkeys valid | MUST | ✅ | bech32 prefix check |
 
-### §6 — Bond / State Machine (7/7 ✅)
+### §6: Bond / State Machine (7/7 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
@@ -94,32 +94,32 @@ are test-coverage gaps, not spec/code contradictions. Zero failures.
 | 6.5 | Terminal states include proof from authorized actor | SHOULD | ✅ | Warning, not error |
 | 6.6 | `bond.kind` MUST NOT alter state semantics | MUST NOT | ✅ | kind is opaque string |
 
-### §7 — Consent (2/2 ✅)
+### §7: Consent (2/2 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
 | 7 | `consent.revocable` REQUIRED | MUST | ✅ | Schema: required field |
 | 7 | Other consent fields OPTIONAL | MAY | ✅ | Not in required[] |
 
-### §8 — Policies (1/1 ✅)
+### §8: Policies (1/1 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
 | 8 | Policies are REFERENCED, not embedded | MUST | ✅ | Schema: string|null values |
 
-### §9 — Events (1/1 ✅)
+### §9: Events (1/1 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
 | 9 | Events recommended, not required | MAY | ✅ | Not in required[] |
 
-### §10 — Runtime Metadata (1/1 ✅)
+### §10: Runtime Metadata (1/1 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
 | 10 | Runtime MUST NOT be authoritative | MUST NOT | ✅ | No validation on runtime |
 
-### §11 — Canonicalization (7/9 ✅, 2 ⚠️)
+### §11: Canonicalization (7/9 ✅, 2 ⚠️)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
@@ -133,7 +133,7 @@ are test-coverage gaps, not spec/code contradictions. Zero failures.
 | 11.5 | Unicode NFC normalization | MUST | ⚠️ | Present in normalizeValue() and normalizeRecord() (`.normalize('NFC')`), but **no fixture tests** exercising non-NFC input. |
 | 11.6 | YAML restrictions enforced | MUST | ✅ | rejectRestrictedYaml() + assertStringKeys() |
 
-#### ⚠️ §11.5 — Unicode NFC
+#### ⚠️ §11.5: Unicode NFC
 
 `normalize.ts` calls `.normalize('NFC')` on all string values and keys (lines
 34, 56). This is spec-compliant. However, there is **no fixture** that includes
@@ -142,7 +142,7 @@ verify that canonicalization produces identical output regardless of input form.
 A simple `fixtures/valid/nfc-canonicalization.md` with characters like `é`
 (decomposed `e\u0301`) would fill this gap.
 
-### §12 — Proofs (4/8 ✅, 4 ⚠️)
+### §12: Proofs (4/8 ✅, 4 ⚠️)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
@@ -157,7 +157,7 @@ A simple `fixtures/valid/nfc-canonicalization.md` with characters like `é`
 | 12.5 | Multiple proofs each verified independently | MUST | ✅ | Loop in validateSemantics() |
 | 12.6 | proofs excluded from canonical bytes | MUST | ✅ | Already verified above |
 
-#### ⚠️ §12.2, §12.3 — proofValue encoding
+#### ⚠️ §12.2, §12.3: proofValue encoding
 
 The spec says:
 
@@ -178,7 +178,7 @@ base64. One must change to match the other. Either:
 The matching data type in `types.ts` is `Proof.value: string` (same for both),
 so the type system allows either encoding.
 
-#### ⚠️ §13.2 — No proof-verification fixture
+#### ⚠️ §13.2: No proof-verification fixture
 
 No fixture in `fixtures/valid/` contains actual proof signatures. The
 `full-active.md` fixture has `proofs: []`. There is **no valid Ed25519-signed
@@ -188,17 +188,17 @@ The `verifyProofWithErrors()` function is exercised only when a fixture has
 proofs with values. Since no fixture has them, the code paths for real
 signature verification are **untested** in CI.
 
-### §13 — Validation Levels (3/5 ✅, 2 ⚠️)
+### §13: Validation Levels (3/5 ✅, 2 ⚠️)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
-| 13.1 | Schema validation — JSON Schema draft 2020-12 | MUST | ✅ | ajv/dist/2020 |
+| 13.1 | Schema validation: JSON Schema draft 2020-12 | MUST | ✅ | ajv/dist/2020 |
 | 13.2 | Single-doc semantic + proof verification | MUST | ✅ | validateMateDocument() |
 | 13.2 | MUST perform actual signature verification | MUST | ⚠️ | Code does; **no test covers it** |
 | 13.3 | History-aware transition validation out of scope | OUT | ✅ | Not implemented |
 | 13.4 | Mutual-bond resolution out of scope | OUT | ✅ | Not implemented |
 
-### §14 — Extensions (6/6 ✅)
+### §14: Extensions (6/6 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
@@ -209,7 +209,7 @@ signature verification are **untested** in CI.
 | 14.2 | `mate_version` = major.minor | MUST | ✅ | Pattern: ^0\\.2 |
 | 14.2 | Newer minor versions rejected | MUST | ✅ | Schema pattern |
 
-### §15 — Security (1/1 ✅)
+### §15: Security (1/1 ✅)
 
 | # | Requirement | Type | Status | Notes |
 |---|-------------|------|--------|-------|
@@ -230,7 +230,7 @@ Code:       Buffer.from(value, 'base64')   (← base64, no multibase)
 cannot be verified by another implementation reading the spec literally, and
 vice versa.
 
-**Recommendation:** Update the spec §12.2—12.3 encoding to **base64**.
+**Recommendation:** Update the spec §12.2 to §12.3 encoding to **base64**.
 Rationale: simpler, matches the reference impl, and base64 is more widely
 supported than base58btc for signature encoding. W3C VC Data Integrity 1.0
 uses base58btc but MATE.md isn't a VC format. A future v0.3 could adopt
@@ -249,7 +249,7 @@ microseconds, so these parse correctly. But any third-party implementer looking
 at the fixtures as examples will see the wrong precision.
 
 **Recommendation:** Renormalize all fixture timestamps to use `.000000Z`
-(6-digit) to match the spec's canonical form. Low priority — functional
+(6-digit) to match the spec's canonical form. Low priority: functional
 correctness is fine since the normalize step handles it.
 
 ### Divergence C: Fixture document ordering
@@ -260,7 +260,7 @@ Spec §11.5: Top-level field order = mate_version, subject, object, bond,
 Fixtures:   Some use a different order in YAML
 ```
 
-**Impact:** None — normalization re-sorts per §11.5 before signing. The YAML
+**Impact:** None. Normalization re-sorts per §11.5 before signing. The YAML
 source order only affects readability.
 
 ---
@@ -281,35 +281,35 @@ source order only affects readability.
 
 ## 5. Recommendations
 
-### Before v0.3 (P0 — conformance integrity)
+### Before v0.3 (P0: conformance integrity)
 
-1. **Fix proofValue encoding** — Either change `decodeBase64Signature()` to
-   base58btc (matching spec) or update spec §12.2—12.3 to base64 (matching
+1. **Fix proofValue encoding**: Either change `decodeBase64Signature()` to
+   base58btc (matching spec) or update spec §12.2 to §12.3 to base64 (matching
    code). This is the only spec/code divergence. Without resolution, documents
    produced by this impl are not portable.
 
 2. **Add 4 high-priority fixtures:**
-   - `valid/ed25519-signed-proposed.md` — signed with the vector Ed25519 key
-   - `valid/bip340-signed-proposed.md` — signed with the vector BIP-340 key
-   - `invalid/ed25519-bad-signature.md` — same key, wrong signature value
-   - `invalid/bip340-bad-signature.md` — same key, wrong signature value
+   - `valid/ed25519-signed-proposed.md`: signed with the vector Ed25519 key
+   - `valid/bip340-signed-proposed.md`: signed with the vector BIP-340 key
+   - `invalid/ed25519-bad-signature.md`: same key, wrong signature value
+   - `invalid/bip340-bad-signature.md`: same key, wrong signature value
 
    These validate that the code paths for `verifyProofWithErrors()` actually
    run in CI and that real cryptographic verification works end-to-end.
 
-3. **Fix fixture timestamps** — Reformat all fixture dates from `.000Z` to
+3. **Fix fixture timestamps**: Reformat all fixture dates from `.000Z` to
    `.000000Z` to match the canonical form.
 
 ### For v0.3 planning (lower priority)
 
-4. **Fix `canonicalizeAllFixtures` test** — add a test that normalizes all
+4. **Fix `canonicalizeAllFixtures` test**: add a test that normalizes all
    valid fixtures and verifies the output is deterministic (idempotent).
 
-5. **Add `valid.none` check** — The spec defines `none` as an initial state,
+5. **Add `valid.none` check**: The spec defines `none` as an initial state,
    but a document in `none` declares nothing. Consider whether `none` should
    emit a semantic warning recommending `proposed` instead.
 
-6. **Clarify `canonicalized-at` format in proof metadata** — If the spec wants
+6. **Clarify `canonicalized-at` format in proof metadata**: If the spec wants
    absolute cross-impl reproducibility, define a `proof.canonicalized_at`
    field (not currently in the schema).
 
@@ -320,7 +320,7 @@ source order only affects readability.
 **MATE.md v0.2 passes conformance review.**
 
 The spec and implementation are substantively aligned. 44 of 52 normative
-requirements are fully met. The remaining 8 are test-coverage gaps — the code
+requirements are fully met. The remaining 8 are test-coverage gaps. The code
 implements the features, but no fixture exercises them in CI.
 
 The single spec/code **divergence** is `proofValue` encoding (base64 vs

@@ -15,7 +15,7 @@ Please keep the core low-level.
 ## Scope
 
 This repository is **protocol only**. Before proposing a change, read
-[`docs/SCOPE.md`](docs/SCOPE.md) — it draws the line between what belongs here
+[`docs/SCOPE.md`](docs/SCOPE.md). It draws the line between what belongs here
 (Layer 1: identity, bond state, canonicalization, proofs, the Nostr transport
 binding, and the reference implementation) and what belongs in the separate
 Layer 2 repo (behavior, messaging, policy, runtime, product).

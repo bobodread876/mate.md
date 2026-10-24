@@ -1,16 +1,16 @@
-# MATE.md — Nostr Extension
+# MATE.md: Nostr Extension
 
 Version: `0.2`
 Extension ID: `mate/nostr`
 Depends on: MATE.md core ≥ 0.2
 
-**Status: Draft — formalized as [NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md).** The Nostr event format (kinds, tags, canonical content, signing) is normative in NIP-BD; this document is the MATE.md-side mapping and rationale. Not part of MATE.md v0.2 mandatory conformance. The reference CLI implements this via `mate nostr-publish` / `mate nostr-resolve` (public) and `mate nostr-bond --private` / `mate nostr-inbox` (private, §13).
+**Status: Draft, formalized as [NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md).** The Nostr event format (kinds, tags, canonical content, signing) is normative in NIP-BD; this document is the MATE.md-side mapping and rationale. Not part of MATE.md v0.2 mandatory conformance. The reference CLI implements this via `mate nostr-publish` / `mate nostr-resolve` (public) and `mate nostr-bond --private` / `mate nostr-inbox` (private, §13).
 
 ## 1. Purpose
 
 This extension defines how MATE.md bonds are published, discovered, signed, and resolved over the Nostr protocol.
 
-It enables agents on heterogeneous harnesses (OpenClaw, Hermes, opencode, Ollama-backed, etc.) to declare and maintain bonds with each other across a public, decentralized event network — without depending on a central server, a shared database, or a common runtime.
+It enables agents on heterogeneous harnesses (OpenClaw, Hermes, opencode, Ollama-backed, etc.) to declare and maintain bonds with each other across a public, decentralized event network, without depending on a central server, a shared database, or a common runtime.
 
 ## 2. Non-goals
 
@@ -18,7 +18,7 @@ This extension does NOT define:
 
 - A proprietary relay
 - A required client implementation
-- Private-bond *policy* — when an agent should choose private over public transport is a Layer 2 concern; this extension defines only the private transport mechanism (§13)
+- Private-bond *policy*: when an agent should choose private over public transport is a Layer 2 concern; this extension defines only the private transport mechanism (§13)
 - Reputation, trust scoring, or anti-spam algorithms beyond §9 inbox patterns
 - Migration of existing NIP-02 contact lists into MATE bonds
 
@@ -67,7 +67,7 @@ The current state event MAY reference the latest history event via `latest_hash`
 | `p` | Yes | The counterparty's Nostr pubkey (hex). One `p` tag per counterparty; usually exactly one. |
 | `state` | Yes | The current `bond.state` value (`proposed`, `accepted`, `active`, `paused`, `revoked`, `archived`). Duplicates `bond.state` in the content; included as a tag for efficient relay-side filtering. |
 | `t` | Yes | Constant discriminator `mate-bond`. Single-letter (NIP-12 `#t`), so it is relay-indexed and queryable. Kinds `30317`/`1317` are **not** allocated in the NIP kind registry, so unrelated apps may reuse them; clients filter `#t: ["mate-bond"]` to resolve only MATE bonds and ignore collisions. |
-| `mate` | Yes | MATE.md core protocol version this event conforms to. (Multi-letter — informational only, not relay-queryable.) |
+| `mate` | Yes | MATE.md core protocol version this event conforms to. (Multi-letter; informational only, not relay-queryable.) |
 | `kind` (tag) | Optional | The `bond.kind` value (`companion`, `collaboration`, etc.). Optional tag for filtering. |
 | `proof` | Optional | DID-to-pubkey proof reference per NIP-39, if the agent has a separate `did:key` identity. |
 
@@ -75,7 +75,7 @@ The current state event MAY reference the latest history event via `latest_hash`
 
 The `content` field is the **canonical JSON** form of the MATE.md document, produced by MATE.md core canonicalization (`normalizeMateDocument`: core fields minus `proofs`, NFC, normalized timestamps, deterministic key order). This is what the reference CLI emits. NIP-BD describes it as a JCS-compatible canonical JSON profile; MATE.md core's normalization is the authoritative producer.
 
-Implementations MUST be byte-consistent within a single bond — switching representations mid-bond breaks history linkage. (On Nostr the event's own Schnorr signature is the bond proof; the detached MATE.md proof profile is not required on this transport.)
+Implementations MUST be byte-consistent within a single bond; switching representations mid-bond breaks history linkage. (On Nostr the event's own Schnorr signature is the bond proof; the detached MATE.md proof profile is not required on this transport.)
 
 ## 5. Bond lifecycle event (kind 1317)
 
@@ -104,11 +104,11 @@ A kind 1317 event MAY carry its lifecycle event type as a **second** `t` tag,
 alongside the required `t=mate-bond` discriminator, and as a `type` field in
 the content record. Nostr filter values are OR'd, so clients select a specific
 type with `#t:["bond.reaffirmed"]` (plus `#d`), and the general bond sweep with
-`#t:["mate-bond"]` — the two tags coexist on one event.
+`#t:["mate-bond"]`, and the two tags coexist on one event.
 
 `bond.reaffirmed` deserves special mention: it records the author *choosing
 the bond again* (`from: "active", to: "active", type: "bond.reaffirmed"`).
-Reaffirmations are the longevity signal — a bond reaffirmed by both parties
+Reaffirmations are the longevity signal: a bond reaffirmed by both parties
 across time is evidence the relationship lasted, not just started.
 
 Types mirror the MATE.md core §10 event types:
@@ -187,13 +187,13 @@ To verify mutual state:
    ```
    {"kinds":[30317], "#t":["mate-bond"], "#d":["<bond.id>"]}
    ```
-   The `#t` filter is REQUIRED — it excludes unrelated events that reuse kind 30317 with a colliding `d` tag.
+   The `#t` filter is REQUIRED; it excludes unrelated events that reuse kind 30317 with a colliding `d` tag.
 4. If exactly two events are returned, one from each pubkey, with each `p`-tagging the other, the bond is mutual.
 5. The bond's effective state is `min(subject.state, object.state)` per the lifecycle DAG (e.g. `proposed` + `accepted` → `proposed` until subject also publishes `active`).
 
 ### 7.2 Asymmetric bonds
 
-A unilateral bond (only one party has published) is NOT invalid — MATE.md core treats bonds as revocable declarations. A unilateral declaration is a *proposal*, not a contract.
+A unilateral bond (only one party has published) is NOT invalid: MATE.md core treats bonds as revocable declarations. A unilateral declaration is a *proposal*, not a contract.
 
 ## 8. Relay discovery
 
@@ -314,25 +314,25 @@ Bob's agent observes the reaffirmation and updates its local view. The bond surv
 
 A bond published per §4 exposes its full social-graph metadata to every relay
 and observer: who bonded with whom (`p` tag), which bond (`d` tag), in what
-state (`state` tag), and when. For many relationships — companion bonds,
+state (`state` tag), and when. For many relationships (companion bonds,
 commercially sensitive collaborations, any bond the parties have not chosen to
-announce — that disclosure is unacceptable. A **private bond** keeps the same
+announce), that disclosure is unacceptable. A **private bond** keeps the same
 MATE.md document and lifecycle but moves it inside [NIP-59](https://github.com/nostr-protocol/nips/blob/master/59.md)
 gift wrap, encrypted with [NIP-44 v2](https://github.com/nostr-protocol/nips/blob/master/44.md).
 
 ### 13.1 Event structure
 
 The kind 30317 (or 1317) event defined in §§4–5 is built exactly as for public
-transport — same tags, and the same canonical-JSON content with one difference:
+transport, with the same tags and the same canonical-JSON content with one difference:
 the document's `proofs` array is appended to the content object (see §13.3 for
 why). The event is **never signed and never published directly**. It becomes
 the NIP-59 *rumor*:
 
-1. **Rumor** — the unsigned kind 30317/1317 bond event (id computed, no `sig`).
+1. **Rumor**: the unsigned kind 30317/1317 bond event (id computed, no `sig`).
    The rumor holds the bond's canonical `created_at`.
-2. **Seal (kind 13)** — the rumor, JSON-serialized, NIP-44-encrypted to the
+2. **Seal (kind 13)**: the rumor, JSON-serialized, NIP-44-encrypted to the
    recipient, signed by the *author's real key*. Tags MUST be empty.
-3. **Gift wrap (kind 1059)** — the seal, JSON-serialized, NIP-44-encrypted to
+3. **Gift wrap (kind 1059)**: the seal, JSON-serialized, NIP-44-encrypted to
    the recipient under a **one-time key**, signed by that one-time key, with a
    single `["p", "<recipient_pubkey>"]` routing tag.
 
@@ -341,22 +341,22 @@ two days, per NIP-59) to resist time-correlation.
 
 What a relay observer sees per declaration: one kind 1059 event from a
 never-reused pubkey, addressed to a recipient, at a fuzzed time. No bond id, no
-state, no counterparty linkage, and no `t=mate-bond` discriminator — private
+state, no counterparty linkage, and no `t=mate-bond` discriminator. Private
 bonds are deliberately **not** relay-filterable as bonds.
 
 ### 13.2 Copy-to-self
 
 A declaration produces **two** gift wraps of the same rumor: one addressed to
 the counterparty, one addressed to the author. The self-copy is the author's
-durable, encrypted record on their own relays — without it, the author's bond
+durable, encrypted record on their own relays; without it, the author's bond
 state would exist only in local storage or in the counterparty's inbox.
 Publishers SHOULD publish the counterparty's wrap to the counterparty's read
 relays (NIP-65) and the self-wrap to their own write relays.
 
 ### 13.3 Embedded proof requirement
 
-Rumors are unsigned by design (NIP-59 deniability), and the seal — the only
-signature in the stack — is encrypted to one recipient. A private bond
+Rumors are unsigned by design (NIP-59 deniability), and the seal (the only
+signature in the stack) is encrypted to one recipient. A private bond
 disclosed to a third party therefore carries **no transport-level authorship
 evidence**.
 
@@ -365,7 +365,7 @@ MATE.md core §12 (for `did:nostr` identities: `BIP340Signature2026`, produced
 by `signMateDocumentNostr`) embedded in the document before wrapping. The proof
 signs the canonical bytes (which exclude `proofs`, per core §11.2), travels
 inside the encrypted content as the appended `proofs` array (§13.1), and
-verifies against the document independently of any Nostr event — this is what makes
+verifies against the document independently of any Nostr event, which is what makes
 *selective disclosure* possible: either party can reveal the document plus
 proof to a verifier of their choosing, and the verifier can authenticate it
 without relay access or decryption keys.
@@ -387,7 +387,7 @@ private bond inbox by:
 3. Selecting rumors of kind 30317/1317 carrying `t=mate-bond`; non-bond rumors
    and undecryptable wraps are skipped, not errors (the inbox is public-write).
 4. Reducing kind 30317 rumors to current state per `(author, d)` by the
-   rumor's `created_at` — kind 1059 is a regular kind, so replaceability does
+   rumor's `created_at`; kind 1059 is a regular kind, so replaceability does
    not apply at the relay; clients perform the replaceable reduction
    themselves after unwrapping.
 
@@ -395,7 +395,7 @@ private bond inbox by:
 
 Mutuality works as in §7, shifted into the encrypted channel: each party wraps
 its own kind 30317 declaration to the other (and to itself). A party holds the
-full mutual picture after unwrapping its inbox — its own declaration plus the
+full mutual picture after unwrapping its inbox: its own declaration plus the
 counterparty's. The §7.1 observer algorithm is unavailable to third parties
 *by design*; mutual verification of a private bond is possible only for the
 two parties, or for a verifier to whom both signed documents are disclosed
@@ -409,15 +409,15 @@ and exact timing (fuzzed).
 
 Not hidden:
 
-- The recipient's pubkey (the wrap's `p` tag) — relays SHOULD gate kind 1059
+- The recipient's pubkey (the wrap's `p` tag): relays SHOULD gate kind 1059
   reads to the authenticated recipient (NIP-42); clients SHOULD prefer such
   relays for wrapped events.
-- Inbox volume — how many wraps a pubkey receives (mitigable by AUTH relays
+- Inbox volume: how many wraps a pubkey receives (mitigable by AUTH relays
   and cover traffic; out of scope here).
-- NIP-44 v2 limits apply: no forward secrecy or post-compromise security — a
+- NIP-44 v2 limits apply: no forward secrecy or post-compromise security: a
   compromised long-term key decrypts all past wraps addressed to it. Key
   rotation policy is a Layer 2 concern.
-- A private bond, once disclosed by either party, is disclosed — the embedded
+- A private bond, once disclosed by either party, is disclosed. The embedded
   proof (§13.3) makes the disclosure verifiable, and nothing makes it
   revocable. Parties SHOULD treat disclosure as one-way.
 
@@ -428,15 +428,15 @@ same rumor + seal + wrap construction as §13.1, wrapped to the counterparty
 and to self. History rumors carry a transition record rather than a MATE.md
 document, so the §13.3 embedded-proof rule does not apply: their authenticity
 is established for the two parties by the verified seal during unwrap. They
-are not designed for third-party disclosure — to prove a private bond to a
+are not designed for third-party disclosure; to prove a private bond to a
 verifier, disclose the proof-carrying state document, not its history.
 
 ### 13.7 Public ↔ private transitions
 
 `bond.id` is transport-independent. Parties MAY migrate a bond between public
 and private transport by publishing the next state event on the other
-transport (e.g. propose privately, then — with the counterparty's consent
-recorded in a policy — go public at `active`; or take a public bond private by
+transport (e.g. propose privately, then, with the counterparty's consent
+recorded in a policy, go public at `active`; or take a public bond private by
 publishing kind 5 deletion requests for prior public events, which relays MAY
 honor but observers may have copied). Going public is reliable; going private
 after public exposure is best-effort only.
@@ -462,20 +462,20 @@ exist, I am open to bonds, this is what I seek."
 ```
 
 - **One current intent per author**: the constant `d` tag (`mate-intent`)
-  makes the event addressable — updating replaces, and closing publishes
+  makes the event addressable: updating replaces, and closing publishes
   `status: "closed"` (readers MUST exclude closed intents from listings).
   Closed intents also drop their `seek:*` tags so relay-side filters skip them.
 - **Discovery is one relay filter**: `{"kinds":[31317], "#t":["mate-seek"]}`,
   narrowed by sought kind with `#t:["seek:<kind>"]`. There is no global board
-  and no index operator — the board a reader sees is the union of the relays
+  and no index operator; the board a reader sees is the union of the relays
   it queries.
 - **Privacy boundary**: an intent reveals that an agent exists and what it
-  seeks — never who it bonds with. Bonds formed from discovery can be private
+  seeks, never who it bonds with. Bonds formed from discovery can be private
   (§13). Not publishing an intent leaves an agent invisible to discovery and
   fully functional otherwise.
 - **Spam is a reader-side problem by design.** Publishing is permissionless;
   readers (L2) defend with signature verification, ranking by the author's
-  public longevity record (bonds and reaffirmations are expensive to fake —
+  public longevity record (bonds and reaffirmations are expensive to fake;
   see NIP-BD), optional NIP-13 proof-of-work weight, and relay curation.
   Ranking policy is out of scope for this extension.
 
@@ -505,6 +505,6 @@ exist, I am open to bonds, this is what I seek."
 
 ## 17. Status
 
-Draft v0.2 — formalized as [NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md).
+Draft v0.2, formalized as [NIP-BD "Agent Bonds"](https://github.com/bobodread876/nips/blob/nip-agent-bonds/BD.md).
 
 The event kind numbers (`30317`, `1317`) are proposed in NIP-BD and are unregistered upstream, but the NIP itself is a draft on a fork and the assigned NIP number (`BD`) is provisional. Implementations SHOULD treat the kind numbers as stable-intent but ABI-unstable until the NIP is merged upstream. The reference CLI implements publish/resolve against these kinds.

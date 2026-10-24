@@ -1,4 +1,4 @@
-# MATE.md v0.2 Build Plan — Consolidated Dual-Model Review
+# MATE.md v0.2 Build Plan: Consolidated Dual-Model Review
 
 **Reviewers:** Patoo (deepseek) + Vandana (gpt-5.5, max thinking)  
 **Date:** 2026-06-03
@@ -9,9 +9,9 @@
 
 1. **Plan framing is correct.** v0.2 as a spec-and-reference release, not a product. Deferring Nostr is right. Scope discipline is good.
 
-2. **TypeScript is the right first language** for reference implementation — fits Node + browser, good conformance tooling.
+2. **TypeScript is the right first language** for reference implementation: it fits Node + browser, good conformance tooling.
 
-3. **`additionalProperties: false` on core, keep `extensions` open** — both call out the core/extension boundary as critical.
+3. **`additionalProperties: false` on core, keep `extensions` open**: both call out the core/extension boundary as critical.
 
 4. **3 weeks is optimistic.** Both flag that canonicalization + proof semantics will take longer than estimated.
 
@@ -38,9 +38,9 @@ Define explicitly in the plan:
 
 ### 4. Separate document validation from transition validation
 The spec must distinguish:
-- **Single-document invariants** — validateable from one MATE.md file (schema check, required fields per state)
-- **Transition validation** — requires previous state or event log (out of scope for v0.2 reference impl, but spec must note it)
-- **Mutual-bond resolution** — requires both parties' documents (out of scope for v0.2)
+- **Single-document invariants**: validateable from one MATE.md file (schema check, required fields per state)
+- **Transition validation**: requires previous state or event log (out of scope for v0.2 reference impl, but spec must note it)
+- **Mutual-bond resolution**: requires both parties' documents (out of scope for v0.2)
 
 ### 5. Move from 3-package monorepo to single package
 One npm package exposing:
@@ -54,10 +54,10 @@ Target: Node ESM, browser-safe exports. No separate parser/validator/cli package
 `fixtures/manifest.json` with expected outcome, category (schema-valid, spec-valid, canonicalization-valid, proof-valid), and rationale. Don't just drop files in valid/invalid folders.
 
 ### 7. CLI changes
-- `mate validate <file...>` — schema + single-doc semantics
-- `mate inspect <file>` — outputs normalized JSON (proves canonicalization works)
+- `mate validate <file...>`: schema + single-doc semantics
+- `mate inspect <file>`: outputs normalized JSON (proves canonicalization works)
 - Drop `mate check <spec-dir>` from v0.2 scope
-- `mate conformance` — runs reference test suite
+- `mate conformance`: runs reference test suite
 
 ### 8. Cleanup
 - Remove `GIT_INIT_NOTE.txt` (scaffolding debris)
