@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.1 (2026-11-09)
+
+### Changed
+
+- `DEFAULT_RELAYS` drops `wss://relay.damus.io`, which now refuses
+  unauthenticated WebSocket connections (HTTP 503). The defaults are
+  `wss://relay.islandbitcoin.com` and `wss://nos.lol`.
+
 ## 0.7.0 (2026-06-10)
 
 ### Added — discovery (bond intents)

@@ -1,11 +1,11 @@
 {
   "name": "@mate-protocol/core",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Reference implementation for the MATE.md v0.2 protocol.",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "mate": "./dist/cli.js"
+    "mate": "dist/cli.js"
   },
   "exports": {
     ".": {

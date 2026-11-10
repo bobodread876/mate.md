@@ -22,7 +22,6 @@ export const BOND_TAG = 'mate-bond';
 
 export const DEFAULT_RELAYS = [
   'wss://relay.islandbitcoin.com',
-  'wss://relay.damus.io',
   'wss://nos.lol',
 ];
 
